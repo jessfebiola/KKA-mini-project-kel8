@@ -250,6 +250,3 @@ def draw_page(screen, data_game):
 
     elif page == "lose":
         draw_lose(screen)
-
-    elif page == "credit":
-        draw_credit(screen)
