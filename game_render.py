@@ -136,24 +136,6 @@ def draw_lose(screen):
 
 
 # ==================================================
-# MENAMPILKAN SETTING DAN CREDIT
-# ==================================================
-
-def draw_setting(screen):
-
-    # Menampilkan halaman Setting.
-
-    pass
-
-
-def draw_credit(screen):
-
-    # Menampilkan halaman Credit.
-
-    pass
-
-
-# ==================================================
 # MENAMPILKAN PAGE SESUAI KONDISI GAME
 # ==================================================
 
@@ -175,9 +157,6 @@ def draw_page(screen, data_game):
 
     elif page == "lose":
         draw_lose(screen)
-
-    elif page == "setting":
-        draw_setting(screen)
 
     elif page == "credit":
         draw_credit(screen)
