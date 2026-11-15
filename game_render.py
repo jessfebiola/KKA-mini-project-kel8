@@ -10,33 +10,196 @@ import pygame
 
 LEVELS = {
 
-    1: {
-        "tiles": [
-            # Isi koordinat tile Level 1.
-        ],
+    1: {   
+    "tiles": {
+        (0,0): "normal",
+        (1,0): "normal",
+        (2,0): "normal",
+        (3,0): "normal",
 
-        "start": None,  # Isi posisi awal block.
-        "goal": None    # Isi posisi goal.
+        (0,1): "normal",
+        (1,1): "normal",
+        (2,1): "normal",
+        (3,1): "normal",
+        (4,1): "normal",
+        (5,1): "normal",
+
+        (0,2): "normal",
+        (1,2): "normal",
+        (2,2): "normal",
+        (3,2): "normal",
+        (4,2): "normal",
+        (5,2): "normal",
+        (6,2): "normal",
+        (7,2): "normal",
+        (8,2): "normal",
+        (9,2): "normal",
+
+        (1,3): "normal",
+        (2,3): "normal",
+        (3,3): "normal",
+        (4,3): "normal",
+        (5,3): "normal",
+        (6,3): "normal",
+        (7,3): "normal",
+        (8,3): "normal",
+        (9,3): "normal",
+
+        (5,4): "normal",
+        (6,4): "normal",
+        (7,4): "goal",
+        (8,4): "normal",
+        (9,4): "normal",
+
+        (6,5): "normal",
+        (7,5): "normal",
+        (8,5): "normal"
+    },
+        "start": (1,1),  # Isi posisi awal block.
+        "goal": (7,4)    # Isi posisi goal.
     },
 
     2: {
-        "tiles": [
-            # Isi koordinat tile Level 2.
-        ],
+        "tiles": {
+        (6,0): "normal",
+        (7,0): "normal",
+        (8,0): "normal",
+        (9,0): "normal",
+        (12,0): "normal",
+        (13,0): "normal",
+        (14,0): "normal",
 
-        "start": None,
-        "goal": None
+        (0,1): "normal",
+        (1,1): "normal",
+        (2,1): "normal",
+        (3,1): "normal",
+        (6,1): "normal",
+        (7,1): "normal",
+        (8,1): "x",
+        (9,1): "normal",
+        (12,1): "normal",
+        (13,1): "goal",
+        (14,1): "normal",
+
+        (0,2): "normal",
+        (1,2): "normal",
+        (2,2): "o",
+        (3,2): "normal",
+        (6,2): "normal",
+        (7,2): "normal",
+        (8,2): "normal",
+        (9,2): "normal",
+        (12,2): "normal",
+        (13,2): "normal",
+        (14,2): "normal",
+
+        (0,3): "normal",
+        (1,3): "normal",
+        (2,3): "normal",
+        (3,3): "normal",
+        (6,3): "normal",
+        (7,3): "normal",
+        (8,3): "normal",
+        (9,3): "normal",
+        (12,3): "normal",
+        (13,3): "normal",
+        (14,3): "normal",
+
+        (0,4): "normal",
+        (1,4): "normal",
+        (2,4): "normal",
+        (3,4): "normal",
+        (4,4): "bridge",
+        (5,4): "bridge",
+        (6,4): "normal",
+        (7,4): "normal",
+        (8,4): "normal",
+        (9,4): "normal",
+        (10,4): "bridge",
+        (11,4): "bridge",
+        (12,4): "normal",
+        (13,4): "normal",
+        (14,4): "normal",
+
+
+        (0,5): "normal",
+        (1,5): "normal",
+        (2,5): "normal",
+        (3,5): "normal",
+        (6,5): "normal",
+        (7,5): "normal",
+        (8,5): "normal",
+        (9,5): "normal"
+        },
+
+        "start": (1,4),
+        "goal": (13,1)
     },
 
     3: {
-        "tiles": [
-            # Isi koordinat tile Level 3.
-        ],
+        "tiles": {
+        (6,0): "normal",
+        (7,0): "normal",
+        (8,0): "normal",
+        (9,0): "normal",
+        (10,0): "normal",
+        (11,0): "normal",
+        (12,0): "normal",
 
-        "start": None,
-        "goal": None
+        (0,1): "normal",
+        (1,1): "normal",
+        (2,1): "normal",
+        (3,1): "normal",
+        (6,1): "normal",
+        (7,1): "normal",
+        (8,1): "normal",
+        (11,1): "normal",
+        (12,1): "normal",
+
+        (0,2): "normal",
+        (1,2): "normal",
+        (2,2): "normal",
+        (3,2): "normal",
+        (4,2): "normal",
+        (5,2): "normal",
+        (6,2): "normal",
+        (7,2): "normal",
+        (8,2): "normal",
+        (11,2): "normal",
+        (12,2): "normal",
+        (13,2): "normal",
+        (14,2): "normal",
+        
+
+        (0,3): "normal",
+        (1,3): "normal",
+        (2,3): "normal",
+        (3,3): "normal",
+        (11,3): "normal",
+        (12,3): "normal",
+        (13,3): "goal",
+        (14,3): "normal",
+
+        (0,4): "normal",
+        (1,4): "normal",
+        (2,4): "normal",
+        (3,4): "normal",
+        (11,4): "normal",
+        (12,4): "normal",
+        (13,4): "normal",
+        (14,4): "normal",
+
+
+        (12,5): "normal",
+        (13,5): "normal",
+        (14,5): "normal"
+        },
+
+        "start": (1,3),
+        "goal": (13,3)
     }
 }
+
 
 
 # ==================================================
