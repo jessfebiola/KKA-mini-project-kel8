@@ -69,32 +69,59 @@ def atur_menu(event):
 
 def gerak_pemain(event):
 
-    # Mendeteksi tombol arah keyboard.
-    # Menentukan arah: UP, DOWN, LEFT, atau RIGHT.
-    # Memanggil move_block() dari game_logic.py.
-    # Memperbarui posisi block.
-    # Memastikan gerakan tidak dilakukan ketika Solver berjalan.
+    if event.type != pygame.KEYDOWN:
+        return
+    if data_game["page"] != "gameplay":
+        return
+    if data_game["solver_running"]:
+        return
 
-    pass
+    if event.key == pygame.K_UP:
+        direction = "UP"
+    elif event.key == pygame.K_DOWN:
+        direction = "DOWN"
+    elif event.key == pygame.K_LEFT:
+        direction = "LEFT"
+    elif event.key == pygame.K_RIGHT:
+        direction = "RIGHT"
+    else:
+        return
 
+    # Mengambil posisi block saat ini
+    posisi_sekarang = data_game["posisi_block"]
+    # Menghitung posisi block setelah bergerak
+    posisi_baru = move_block(posisi_sekarang, direction)
+    # Menyimpan posisi baru
+    data_game["posisi_block"] = posisi_baru
 
 def cek_game():
 
-    # Memanggil check_fall() dari game_logic.py
-    # untuk mengecek apakah block jatuh.
+    # Pastikan sedang berada di halaman gameplay
+    if data_game["page"] != "gameplay":
+        return
 
-    # Jika block jatuh:
-    # status = "lose"
-    # page = "lose"
+    # Ambil data level yang sedang dimainkan
+    level = data_game["level"]
+    posisi_block = data_game["posisi_block"]
 
-    # Memanggil check_win() dari game_logic.py
-    # untuk mengecek apakah block mencapai goal.
+    # Kalau data belum tersedia, hentikan pengecekan
+    if level is None or posisi_block is None:
+        return
 
-    # Jika block mencapai goal:
-    # status = "win"
-    # page = "win"
+    # Ambil tiles dan goal dari LEVELS
+    tiles = LEVELS[level]["tiles"]
+    goal = LEVELS[level]["goal"]
 
-    pass
+    # Cek apakah block jatuh
+    if check_fall(posisi_block, tiles):
+        data_game["status"] = "lose"
+        data_game["page"] = "lose"
+        return
+
+    # Cek apakah block mencapai goal
+    if check_win(posisi_block, goal):
+        data_game["status"] = "win"
+        data_game["page"] = "win"
 
 
 # ==================================================

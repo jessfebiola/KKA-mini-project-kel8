@@ -5,12 +5,49 @@
 
 def move_block(state, direction):
 
-    # Menerima posisi block dan arah gerakan.
-    # Menghitung posisi block setelah bergerak.
-    # Mengatur perubahan orientasi block.
-    # Mengembalikan posisi block yang baru.
+    (r1, c1), (r2, c2) = state
 
-    pass
+    # Block berdiri
+    if (r1, c1) == (r2, c2):
+
+        if direction == "UP":
+            return ((r1 - 2, c1), (r1 - 1, c1))
+        elif direction == "DOWN":
+            return ((r1 + 1, c1), (r1 + 2, c1))
+        elif direction == "LEFT":
+            return ((r1, c1 - 2), (r1, c1 - 1))
+        elif direction == "RIGHT":
+            return ((r1, c1 + 1), (r1, c1 + 2))
+
+    # Block tidur horizontal
+    elif r1 == r2:
+        left = min(c1, c2)
+        right = max(c1, c2)
+
+        if direction == "UP":
+            return ((r1 - 1, left), (r1 - 1, right))
+        elif direction == "DOWN":
+            return ((r1 + 1, left), (r1 + 1, right))
+        elif direction == "LEFT":
+            return ((r1, left - 1), (r1, left - 1))
+        elif direction == "RIGHT":
+            return ((r1, right + 1), (r1, right + 1))
+
+    # Block tidur vertikal
+    elif c1 == c2:
+        top = min(r1, r2)
+        bottom = max(r1, r2)
+
+        if direction == "LEFT":
+            return ((top, c1 - 1), (bottom, c1 - 1))
+        elif direction == "RIGHT":
+            return ((top, c1 + 1), (bottom, c1 + 1))
+        elif direction == "UP":
+            return ((top - 1, c1), (top - 1, c1))
+        elif direction == "DOWN":
+            return ((bottom + 1, c1), (bottom + 1, c1))
+
+    raise ValueError("Arah gerakan tidak valid")
 
 
 # ==================================================
@@ -19,13 +56,7 @@ def move_block(state, direction):
 
 def check_fall(state, tiles):
 
-    # Mengecek apakah posisi block masih berada
-    # di atas tile yang tersedia.
-    # Jika salah satu bagian block berada di luar tile,
-    # berarti block jatuh.
-    # Mengembalikan True jika jatuh, False jika aman.
-
-    pass
+    return any(posisi not in tiles for posisi in state)
 
 
 # ==================================================
@@ -34,9 +65,4 @@ def check_fall(state, tiles):
 
 def check_win(state, goal):
 
-    # Mengecek apakah block sudah berdiri
-    # tepat di atas posisi goal.
-    # Mengembalikan True jika menang,
-    # False jika belum menang.
-
-    pass
+    return state[0] == state[1] == goal
