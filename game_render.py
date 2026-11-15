@@ -52,6 +52,99 @@ LEVELS = {
 # Memanggil gambar block sesuai orientasi.
 # Memanggil gambar panel, icon, dan font.
 
+from pathlib import Path
+
+# Mengambil lokasi folder assets
+ASSET_DIR = Path(__file__).parent / "assets"
+
+# Menyimpan gambar yang sudah dipanggil
+ASSETS = {}
+
+
+# Memanggil seluruh gambar dari folder assets
+def load_assets():
+
+    nama_assets = [
+        # Background
+        "bg landing",
+        "bg pilih level",
+        "bg lvl 1",
+        "bg lvl 2",
+        "bg lvl 3",
+        "bg party",
+
+        # Background Gameplay
+        "bg js lvl 1",
+        "bg js lvl 2",
+        "bg js lvl 3",
+
+        # Block dan tile
+        "blok berdiri",
+        "blok tidur",
+        "blok lantai",
+        "blok lantai bridge",
+        "blok lantai goal",
+        "blok lantai o",
+        "blok lantai x",
+
+        # Tombol Landing
+        "start",
+        "start hover",
+
+        # Pilihan level
+        "pilih level",
+        "stage 1 idle",
+        "stage 1 selected",
+        "stage 2 idle",
+        "stage 2 selected",
+        "stage 2 locked",
+        "stage 3 idle",
+        "stage 3 selected",
+        "stage 3 locked",
+
+        # Tombol Solver
+        "bfs idle",
+        "bfs selected",
+        "dfs idle",
+        "dfs selected",
+        "ucs idle",
+        "ucs selected",
+        "solve",
+
+        # Panel dan informasi
+        "puzzle guide",
+        "solver performance",
+
+        # Tampilan Win dan Lose
+        "menang",
+        "kalah",
+
+        # Logo dan tulisan
+        "putih",
+        "roll to vivat biru",
+        "roll to vivat kuning",
+
+        # Asset tambahan
+        "jahim",
+        "lantai party"
+    ]
+
+    for nama in nama_assets:
+
+        # Mencari file berdasarkan nama tanpa ekstensi
+        file = next(
+            (f for f in ASSET_DIR.iterdir() if f.stem == nama),
+            None
+        )
+
+        if file is not None:
+            ASSETS[nama] = pygame.image.load(
+                str(file)
+            ).convert_alpha()
+
+        else:
+            print(f"Asset tidak ditemukan: {nama}")
+
 pass
 
 
