@@ -322,18 +322,18 @@ ASSET_LAYOUT = {
     # =========================
 
     "roll to vivat kuning": {
-        "pos": (450, 250),
-        "size": (540, 250)
+        "pos": (295, 165),
+        "size": (850, 118)
     },
 
     "roll to vivat biru": {
-        "pos": (450, 250),
-        "size": (540, 250)
+        "pos": (295, 165),
+        "size": (850, 118)
     },
 
     "jahim": {
-    "pos": (590, 450),
-    "size": (260, 280)
+    "pos": (590, 318),
+    "size": (260, 295)
     },
 
     "start": {
@@ -352,48 +352,48 @@ ASSET_LAYOUT = {
     # =========================
 
     "pilih level": {
-        "pos": (450, 150),
-        "size": (540, 120)
+        "pos": (345, 145),
+        "size": (750, 90)
     },
 
     "stage 1 idle": {
-        "pos": (300, 450),
-        "size": (220, 220)
+        "pos": (0, 380),
+        "size": (600, 600)
     },
 
     "stage 1 selected": {
-        "pos": (300, 450),
-        "size": (220, 220)
+        "pos": (0, 380),
+        "size": (600, 600)
     },
 
     "stage 2 idle": {
-        "pos": (610, 450),
-        "size": (220, 220)
+        "pos": (420, 380),
+        "size": (600, 600)
     },
 
     "stage 2 locked": {
-        "pos": (610, 450),
-        "size": (220, 220)
+        "pos": (420, 380),
+        "size": (600, 600)
     },
 
     "stage 2 selected": {
-        "pos": (610, 450),
-        "size": (220, 220)
+        "pos": (420, 380),
+        "size": (600, 600)
     },
 
     "stage 3 idle": {
-        "pos": (920, 450),
-        "size": (220, 220)
+        "pos": (840, 380),
+        "size": (600, 600)
     },
 
     "stage 3 locked": {
-        "pos": (920, 450),
-        "size": (220, 220)
+        "pos": (840, 380),
+        "size": (600, 600)
     },
 
     "stage 3 selected": {
-        "pos": (920, 450),
-        "size": (220, 220)
+        "pos": (840, 380),
+        "size": (600, 600)
     },
 
 
@@ -557,6 +557,13 @@ def gambar_asset(screen, nama, layout_key):
     gambar = ASSETS[nama]
 
     if ukuran is not None:
+        # Asset menu disesuaikan proporsional (tidak penyet).
+        if nama in {"roll to vivat kuning", "roll to vivat biru", "jahim", "pilih level", "start", "start hover"} or nama.startswith("stage "):
+            w, h = gambar.get_size()
+            faktor = min(ukuran[0] / w, ukuran[1] / h)
+            ukuran = (max(1, round(w * faktor)), max(1, round(h * faktor)))
+            posisi = (posisi[0] + (layout["size"][0] - ukuran[0]) // 2,
+                      posisi[1] + (layout["size"][1] - ukuran[1]) // 2)
         key = (nama, tuple(ukuran))
         if key not in ASSET_SCALE_CACHE:
             ASSET_SCALE_CACHE[key] = pygame.transform.smoothscale(gambar, ukuran)
@@ -577,6 +584,13 @@ def gambar_background(screen, nama):
     screen.blit(ASSET_SCALE_CACHE[key], (0, 0))
 
 
+# Posisi mouse dalam koordinat desain 1440x1024.
+VIRTUAL_MOUSE_POS = (-100, -100)
+
+def set_virtual_mouse_pos(pos):
+    global VIRTUAL_MOUSE_POS
+    VIRTUAL_MOUSE_POS = pos
+
 # Mengecek posisi kursor pada tombol
 def cek_hover(layout_key):
 
@@ -594,7 +608,7 @@ def cek_hover(layout_key):
     area_tombol = pygame.Rect(posisi, ukuran)
 
     return area_tombol.collidepoint(
-        pygame.mouse.get_pos()
+        VIRTUAL_MOUSE_POS
     )
 
 
@@ -952,19 +966,48 @@ def draw_jumpscare(screen, data_game):
 # ==================================================
 
 def draw_party(screen):
+    """Tampilan akhir Level 3, menjaga proporsi seluruh asset."""
+    lebar_layar, tinggi_layar = screen.get_size()
 
-    # Menampilkan background Party
-    gambar_background(
-        screen,
-        "bg party"
-    )
+    # Background memenuhi layar dengan crop tengah, tanpa penyet.
+    background = ASSETS.get("bg party")
+    if background is not None:
+        bw, bh = background.get_size()
+        skala_bg = max(lebar_layar / bw, tinggi_layar / bh)
+        ukuran_bg = (max(1, round(bw * skala_bg)),
+                     max(1, round(bh * skala_bg)))
+        key_bg = ("bg party cover", ukuran_bg)
+        if key_bg not in ASSET_SCALE_CACHE:
+            ASSET_SCALE_CACHE[key_bg] = pygame.transform.smoothscale(
+                background, ukuran_bg
+            )
+        gambar_bg = ASSET_SCALE_CACHE[key_bg]
+        posisi_bg = ((lebar_layar - ukuran_bg[0]) // 2,
+                     (tinggi_layar - ukuran_bg[1]) // 2)
+        screen.blit(gambar_bg, posisi_bg)
+    else:
+        screen.fill((18, 39, 70))
 
-    # Menampilkan lantai Party
-    gambar_asset(
-        screen,
-        "lantai party",
-        "lantai party"
-    )
+    # Kolase party: tampilkan sebesar mungkin sambil mempertahankan
+    # perbandingan lebar dan tinggi asli (tidak gepeng/penyet).
+    kolase = ASSETS.get("lantai party")
+    if kolase is not None:
+        kw, kh = kolase.get_size()
+        area_w = int(lebar_layar * 0.90)
+        area_h = int(tinggi_layar * 0.90)
+        skala = min(area_w / kw, area_h / kh)
+        ukuran = (max(1, round(kw * skala)),
+                  max(1, round(kh * skala)))
+        key_kolase = ("lantai party proporsional", ukuran)
+        if key_kolase not in ASSET_SCALE_CACHE:
+            ASSET_SCALE_CACHE[key_kolase] = pygame.transform.smoothscale(
+                kolase, ukuran
+            )
+        gambar_kolase = ASSET_SCALE_CACHE[key_kolase]
+        posisi = gambar_kolase.get_rect(
+            center=(lebar_layar // 2, tinggi_layar // 2)
+        )
+        screen.blit(gambar_kolase, posisi)
 
 
 # ==================================================

@@ -6,7 +6,7 @@ import time
 
 # Mengambil fungsi tampilan dan data level
 # dari game_render.py
-from game_render import draw_page, LEVELS
+from game_render import draw_page, LEVELS, set_virtual_mouse_pos
 
 # Mengambil fungsi mekanisme game
 # dari game_logic.py
@@ -15,6 +15,7 @@ from game_logic import move_block as move_block_rc, check_fall, check_win
 # Mengambil algoritma pencarian
 # dari solver.py
 from solver import bfs, dfs, ucs
+import fireworks
 
 
 # ==================================================
@@ -26,7 +27,25 @@ pygame.init()
 pygame.mixer.init()
 
 # Ukuran layar mengikuti frame Figma
-screen = pygame.display.set_mode((1440, 1024))
+# Render internal tetap 1440x1024 agar layout game/solver tidak berubah.
+DESIGN_W, DESIGN_H = 1440, 1024
+WINDOW_W, WINDOW_H = 960, 680
+screen = pygame.Surface((DESIGN_W, DESIGN_H))
+window = pygame.display.set_mode((WINDOW_W, WINDOW_H), pygame.RESIZABLE)
+
+def view_rect():
+    ww, wh = window.get_size()
+    scale = min(ww / DESIGN_W, wh / DESIGN_H)
+    w, h = round(DESIGN_W * scale), round(DESIGN_H * scale)
+    return pygame.Rect((ww-w)//2, (wh-h)//2, w, h)
+
+def to_design_pos(pos):
+    rect = view_rect()
+    if not rect.collidepoint(pos):
+        return (-1000, -1000)
+    return (int((pos[0]-rect.x) * DESIGN_W / rect.width),
+            int((pos[1]-rect.y) * DESIGN_H / rect.height))
+
 
 # Judul game
 pygame.display.set_caption("Roll to Vivat")
@@ -258,7 +277,12 @@ def atur_menu(event):
                 data_game["unlocked_level"] = max(data_game["unlocked_level"], level + 1)
                 mulai_level(level + 1)
             else:
-                data_game["page"] = "party"
+                # Jangan otomatis membuka Party dari kemenangan solver.
+                if not data_game.get("solver_result"):
+                    data_game["page"] = "party"
+                    fireworks.reset()
+                else:
+                    data_game["page"] = "level_select"
             return
 
     if event.type != pygame.MOUSEBUTTONDOWN or event.button != 1:
@@ -272,10 +296,11 @@ def atur_menu(event):
         return
 
     if data_game["page"] == "level_select":
+        # Area klik mengikuti posisi ikon stage yang diperbesar.
         tombol_level = {
-            1: pygame.Rect(300, 450, 220, 220),
-            2: pygame.Rect(610, 450, 220, 220),
-            3: pygame.Rect(920, 450, 220, 220)
+            1: pygame.Rect(175, 540, 250, 325),
+            2: pygame.Rect(595, 540, 250, 325),
+            3: pygame.Rect(1015, 540, 250, 325)
         }
         for level, area in tombol_level.items():
             if area.collidepoint(mouse_x, mouse_y):
@@ -368,7 +393,13 @@ def cek_game():
             return
 
         data_game["status"] = "win"
-        data_game["page"] = "win"
+        # Level 3 hanya masuk Party jika diselesaikan secara manual.
+        # Solver tetap menampilkan statistiknya, bukan halaman Party.
+        if level == 3 and not data_game.get("solver_result"):
+            data_game["page"] = "party"
+            fireworks.reset()
+        else:
+            data_game["page"] = "win"
         data_game["solver_running"] = False
         data_game["solver_show_performance"] = False
 
@@ -482,8 +513,13 @@ while running:
 
         if event.type == pygame.QUIT:
             running = False
+        elif event.type == pygame.VIDEORESIZE:
+            window = pygame.display.set_mode((max(600,event.w), max(430,event.h)), pygame.RESIZABLE)
 
         else:
+            # Konversi klik window kecil ke koordinat desain.
+            if event.type in (pygame.MOUSEBUTTONDOWN, pygame.MOUSEBUTTONUP, pygame.MOUSEMOTION):
+                event = pygame.event.Event(event.type, {**event.dict, "pos": to_design_pos(event.pos)})
             # Member 1: Mengatur navigasi
             atur_menu(event)
 
@@ -504,9 +540,16 @@ while running:
 
     # E. MENAMPILKAN PAGE
     # Memanggil draw_page() dari game_render.py
+    set_virtual_mouse_pos(to_design_pos(pygame.mouse.get_pos()))
     draw_page(screen, data_game)
+    if data_game["page"] == "party":
+        fireworks.draw(screen, pygame.time.get_ticks())
 
-    # F. MEMPERBARUI TAMPILAN
+    # F. Skala proporsional dan letterbox agar tidak terpotong/penyet.
+    rect = view_rect()
+    window.fill((15, 15, 15))
+    scaled = pygame.transform.smoothscale(screen, rect.size)
+    window.blit(scaled, rect.topleft)
     pygame.display.flip()
 
     # Membatasi game menjadi 60 FPS
