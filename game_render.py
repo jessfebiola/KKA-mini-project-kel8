@@ -334,7 +334,6 @@ def draw_landing(screen):
 
     # Menampilkan background Landing.
     # Menampilkan logo game.
-    # Menampilkan tombol Start, Setting, dan Credit.
 
     pass
 
@@ -390,6 +389,18 @@ def draw_lose(screen):
 
     pass
 
+# ==================================================
+# MENAMPILKAN PARTY
+# ==================================================
+
+def draw_party(screen):
+
+    # Menampilkan background Party.
+    # Menampilkan lantai Party.
+    # Menampilkan elemen tambahan jika diperlukan.
+
+    screen.blit(ASSETS["bg party"], (0, 0))
+    screen.blit(ASSETS["lantai party"], (0, 0))
 
 # ==================================================
 # MENAMPILKAN PAGE SESUAI KONDISI GAME
@@ -413,3 +424,6 @@ def draw_page(screen, data_game):
 
     elif page == "lose":
         draw_lose(screen)
+
+    elif page == "party":
+        draw_party(screen)
