@@ -324,6 +324,71 @@ pass
 
 pass
 
+# ==================================================
+# FUNGSI BANTUAN TAMPILAN
+# ==================================================
+
+# Menggambar asset berdasarkan konfigurasi layout
+def gambar_asset(screen, nama, layout_key):
+
+    if nama not in ASSETS:
+        return
+
+    if layout_key not in ASSET_LAYOUT:
+        return
+
+    posisi, ukuran = ASSET_LAYOUT[layout_key]
+
+    gambar = ASSETS[nama]
+
+    if ukuran is not None:
+        gambar = pygame.transform.smoothscale(gambar, ukuran)
+
+    screen.blit(gambar, posisi)
+
+
+# Menggambar background memenuhi layar
+def gambar_background(screen, nama):
+
+    if nama not in ASSETS:
+        return
+
+    background = pygame.transform.smoothscale(
+        ASSETS[nama],
+        screen.get_size()
+    )
+
+    screen.blit(background, (0, 0))
+
+
+# Mengecek posisi kursor pada tombol
+def cek_hover(layout_key):
+
+    if layout_key not in ASSET_LAYOUT:
+        return False
+
+    posisi, ukuran = ASSET_LAYOUT[layout_key]
+
+    if ukuran is None:
+        return False
+
+    area_tombol = pygame.Rect(posisi, ukuran)
+
+    return area_tombol.collidepoint(pygame.mouse.get_pos())
+
+
+# Menampilkan teks
+def gambar_teks(screen, tulisan, posisi, ukuran=28):
+
+    font = pygame.font.Font(None, ukuran)
+
+    teks = font.render(
+        str(tulisan),
+        True,
+        (255, 255, 255)
+    )
+
+    screen.blit(teks, posisi)
 
 # ==================================================
 # MENAMPILKAN LANDING
@@ -332,7 +397,26 @@ pass
 def draw_landing(screen):
 
     # Menampilkan background Landing.
+    gambar_background(screen, "bg landing")
     # Menampilkan logo game.
+    gambar_asset(screen, "putih", "logo_landing")
+
+    # Menampilkan tombol Start sesuai kondisi hover
+    if cek_hover("start"):
+
+        gambar_asset(
+            screen,
+            "start hover",
+            "start"
+        )
+
+    else:
+
+        gambar_asset(
+            screen,
+            "start",
+            "start"
+        )
 
     pass
 
@@ -344,12 +428,253 @@ def draw_landing(screen):
 def draw_level_selection(screen):
 
     # Menampilkan background Level Selection.
+    gambar_background(screen, "bg pilih level")
     # Menampilkan judul Pilih Level.
-    # Menampilkan pilihan Stage 1, Stage 2, dan Stage 3.
-    # Menampilkan icon level terkunci atau terbuka.
+    gambar_asset(screen,"pilih level","judul_level")
+    # Mengambil level tertinggi yang sudah terbuka
+    unlocked_level = data_game.get("unlocked_level", 1)
+
+    # Mengambil level yang sedang dipilih
+    selected_level = data_game.get("level")
+
+    # Menampilkan setiap stage
+    for level in range(1, 4):
+
+        if level > unlocked_level:
+            nama_asset = f"stage {level} locked"
+
+        elif level == selected_level:
+            nama_asset = f"stage {level} selected"
+
+        else:
+            nama_asset = f"stage {level} idle"
+
+        gambar_asset(
+            screen,
+            nama_asset,
+            f"stage_{level}"
+        )
 
     pass
 
+# ==================================================
+# MENGGAMBAR TILE
+# ==================================================
+
+def draw_tiles(screen, tiles):
+
+    # Menghubungkan jenis tile dengan asset
+    asset_tiles = {
+        "normal": "blok lantai",
+        "bridge": "blok lantai bridge",
+        "goal": "blok lantai goal",
+        "o": "blok lantai o",
+        "x": "blok lantai x"
+    }
+
+    # Mengambil konfigurasi papan
+    if "board_origin" not in ASSET_LAYOUT:
+        return
+
+    if "tile_size" not in ASSET_LAYOUT:
+        return
+
+    origin = ASSET_LAYOUT["board_origin"]
+    tile_size = ASSET_LAYOUT["tile_size"]
+
+    # Menggambar tile berdasarkan koordinat LEVELS
+    for koordinat, jenis in tiles.items():
+
+        x, y = koordinat
+
+        posisi = (
+            origin[0] + x * tile_size,
+            origin[1] + y * tile_size
+        )
+
+        nama_asset = asset_tiles.get(jenis)
+
+        if nama_asset not in ASSETS:
+            continue
+
+        gambar = pygame.transform.smoothscale(
+            ASSETS[nama_asset],
+            (tile_size, tile_size)
+        )
+
+        screen.blit(gambar, posisi)
+
+
+# ==================================================
+# MENGGAMBAR BLOCK
+# ==================================================
+
+def draw_block(screen, posisi_block):
+
+    if posisi_block is None:
+        return
+
+    # Block dalam posisi berdiri
+    if isinstance(posisi_block[0], int):
+
+        if "standing_block" not in ASSET_LAYOUT:
+            return
+
+        layout_key = "standing_block"
+        nama_asset = "blok berdiri"
+
+    # Block dalam posisi tidur
+    else:
+
+        titik_1, titik_2 = posisi_block
+
+        x1, y1 = titik_1
+        x2, y2 = titik_2
+
+        # Block tidur horizontal
+        if y1 == y2:
+
+            layout_key = "horizontal_block"
+
+        # Block tidur vertikal
+        else:
+
+            layout_key = "vertical_block"
+
+        nama_asset = "blok tidur"
+
+    if nama_asset not in ASSETS:
+        return
+
+    if layout_key not in ASSET_LAYOUT:
+        return
+
+    posisi, ukuran = ASSET_LAYOUT[layout_key]
+
+    gambar = pygame.transform.smoothscale(
+        ASSETS[nama_asset],
+        ukuran
+    )
+
+    # Mengikuti posisi koordinat block
+    if isinstance(posisi_block[0], int):
+
+        x, y = posisi_block
+
+    else:
+
+        titik_1, titik_2 = posisi_block
+
+        x = min(titik_1[0], titik_2[0])
+        y = min(titik_1[1], titik_2[1])
+
+    origin = ASSET_LAYOUT.get("board_origin")
+
+    if origin is None:
+        return
+
+    tile_size = ASSET_LAYOUT.get("tile_size")
+
+    if tile_size is None:
+        return
+
+    posisi_block_layar = (
+        origin[0] + x * tile_size,
+        origin[1] + y * tile_size
+    )
+
+    screen.blit(gambar, posisi_block_layar)
+
+
+# ==================================================
+# MENAMPILKAN TOMBOL SOLVER
+# ==================================================
+
+def draw_solver_buttons(screen, data_game):
+
+    # Mengambil algoritma yang dipilih
+    solver_method = data_game.get("solver_method")
+
+    daftar_solver = {
+        "BFS": ("bfs idle", "bfs selected"),
+        "DFS": ("dfs idle", "dfs selected"),
+        "UCS": ("ucs idle", "ucs selected")
+    }
+
+    # Menampilkan tombol BFS, DFS, dan UCS
+    for nama, asset in daftar_solver.items():
+
+        if solver_method == nama:
+            nama_asset = asset[1]
+
+        else:
+            nama_asset = asset[0]
+
+        gambar_asset(screen,nama_asset,nama.lower())
+
+    # Menampilkan tombol Solve
+    gambar_asset(screen,"solve","solve")
+
+
+# ==================================================
+# MENAMPILKAN PUZZLE GUIDE
+# ==================================================
+
+def draw_puzzle_guide(screen):
+
+    gambar_asset(
+        screen,
+        "puzzle guide",
+        "puzzle_guide"
+    )
+
+# ==================================================
+# MENAMPILKAN SOLVER ALGORITMA SEARCH
+# ==================================================
+def draw_solver_performance(screen, data_game):
+# Membuat lapisan gelap di belakang pop-up
+    overlay = pygame.Surface(
+        screen.get_size(),
+        pygame.SRCALPHA
+    )
+
+    overlay.fill((0, 0, 0, 120))
+    screen.blit(overlay, (0, 0))
+
+    # Menampilkan panel Solver Performance
+    gambar_asset(
+        screen,
+        "solver performance",
+        "solver_performance"
+    )
+
+    # Mengambil hasil pencarian dari solver.py
+    hasil = data_game.get("solver_stats", {})
+
+    informasi = [
+        ("Algorithm", hasil.get("algorithm", "-")),
+        ("Path Length", len(hasil.get("path", []))),
+        ("Discovered State", hasil.get("discovered", "-")),
+        ("Expanded State", hasil.get("expanded", "-")),
+        ("Execution Time", f"{hasil.get('time', 0):.6f} s")
+    ]
+
+    # Menampilkan statistik Solver
+    for index, (label, nilai) in enumerate(informasi):
+
+        layout_key = f"solver_text_{index}"
+
+        if layout_key not in ASSET_LAYOUT:
+            continue
+
+        posisi, ukuran = ASSET_LAYOUT[layout_key]
+
+        gambar_teks(
+            screen,
+            f"{label}: {nilai}",
+            posisi,
+            ukuran
+        )
 
 # ==================================================
 # MENAMPILKAN GAMEPLAY
@@ -358,15 +683,26 @@ def draw_level_selection(screen):
 def draw_gameplay(screen, data_game):
 
     # Mengambil data level yang sedang dimainkan.
+    level = data_game.get("level")
+    if level not in LEVELS:
+        return
+
+    data_level = LEVELS[level]
     # Menampilkan background sesuai level.
+    gambar_background(screen, f"bg lvl {level}")
     # Menggambar tile berdasarkan koordinat.
+    draw_tiles(screen, data_level["tiles"])
     # Menggambar goal.
     # Menggambar block sesuai posisi dan orientasi.
+    draw_block(screen, data_game.get("posisi_block"))
     # Menampilkan tombol Solve, BFS, DFS, dan UCS.
+    draw_solver_buttons(screen, data_game)
     # Menampilkan Puzzle Guide.
-    # Menampilkan Solver Performance jika diperlukan.
+    draw_puzzle_guide(screen)
+    # Menampilkan Solver Performance
+    if data_game.get("solver_show_performance", False):
 
-    pass
+        draw_solver_performance(screen, data_game)
 
 
 # ==================================================
@@ -376,17 +712,16 @@ def draw_gameplay(screen, data_game):
 def draw_win(screen):
 
     # Menampilkan tampilan Congratulations.
+    gambar_asset(screen,"menang","win_popup")
     # Menampilkan tombol Next Level.
 
-    pass
+def draw_jumpscare(screen, data_game):
 
+    # Mengambil level yang sedang dimainkan
+    level = data_game.get("level")
 
-def draw_lose(screen):
-
-    # Menampilkan tampilan You Didn't Make It.
-    # Menampilkan tombol Retry.
-
-    pass
+    # Menampilkan gambar jumpscare sesuai level
+    gambar_background(screen, f"bg js lvl {level}")
 
 # ==================================================
 # MENAMPILKAN PARTY
@@ -394,12 +729,11 @@ def draw_lose(screen):
 
 def draw_party(screen):
 
-    # Menampilkan background Party.
-    # Menampilkan lantai Party.
-    # Menampilkan elemen tambahan jika diperlukan.
+    # Menampilkan background Party
+    gambar_background(screen,"bg party")
 
-    screen.blit(ASSETS["bg party"], (0, 0))
-    screen.blit(ASSETS["lantai party"], (0, 0))
+    # Menampilkan lantai Party
+    gambar_asset(screen, "lantai party","party_floor")
 
 # ==================================================
 # MENAMPILKAN PAGE SESUAI KONDISI GAME
@@ -421,8 +755,8 @@ def draw_page(screen, data_game):
     elif page == "win":
         draw_win(screen)
 
-    elif page == "lose":
-        draw_lose(screen)
+    elif page == "jumpscare":
+        draw_jumpscare(screen, data_game)
 
     elif page == "party":
         draw_party(screen)
