@@ -335,71 +335,177 @@ JUMPSCARE_BACKGROUND_ASSETS = {
 # # Mengatur posisi Puzzle Guide.
 # Mengatur posisi Solver Performance.
 ASSET_LAYOUT = {
+    # =========================
+    # LANDING PAGE
+    # =========================
+    "roll to vivat kuning": {
+        "pos": (450, 250),
+        "size": (540, 250)
+    },
+    "roll to vivat biru": {
+            "pos": (450, 250),
+            "size": (540, 250)
+    },
+    "start": {
+        "pos": (586, 775),
+        "size": (267, 55)
+    },
+    "start hover": {
+        "pos": (560, 748),
+        "size": (319, 108)
+    },
 
-    # SOLVE
+    # =========================
+    # LEVEL SELECTION
+    # =========================
+    "pilih level": {
+        "pos": (450, 150),
+        "size": (540, 120)
+    },
+    "stage 1 idle": {
+        "pos": (300, 450),
+        "size": (220, 220)
+    },
+    "stage 1 selected": {
+        "pos": (300, 450),
+        "size": (220, 220)
+    },
+    "stage 2 idle": {
+        "pos": (610, 450),
+        "size": (220, 220)
+    },
+    "stage 2 locked": {
+        "pos": (610, 450),
+        "size": (220, 220)
+    }, 
+    "stage 2 selected": {
+        "pos": (610, 450),
+        "size": (220, 220)
+    }, 
+    "stage 3 idle": {
+        "pos": (920, 450),
+        "size": (220, 220)
+    },
+    "stage 3 locked": {
+        "pos": (920, 450),
+        "size": (220, 220)
+    },
+    "stage 3 selected": {
+        "pos": (920, 450),
+        "size": (220, 220)
+    },
+
+    # =========================
+    # GAMEPLAY - SOLVER BUTTONS
+    # =========================
     "solve": {
         "pos": (1212, 30),
         "size": (198, 69)
     },
-
-    # BFS
     "bfs idle": {
         "pos": (28, 558),
         "size": (138, 54)
     },
-
     "bfs selected": {
         "pos": (28, 558),
         "size": (138, 54)
     },
-
-    # DFS
     "dfs idle": {
         "pos": (28, 628),
         "size": (138, 54)
     },
-
     "dfs selected": {
         "pos": (28, 628),
         "size": (138, 54)
     },
-
-    # UCS
     "ucs idle": {
         "pos": (28, 698),
         "size": (138, 54)
     },
-
     "ucs selected": {
         "pos": (28, 698),
         "size": (138, 54)
     },
 
-    # PUZZLE GUIDE
+    # =========================
+    # GAMEPLAY - INFORMATION PANEL
+    # =========================
     "puzzle guide": {
         "pos": (28, 768),
         "size": (373, 226)
     },
-
-    # SOLVER PERFORMANCE
     "solver performance": {
         "pos": (853, 727),
-        "size": (559, 269),
-
-    # START BUTTON
-    "start": {
-        "pos": (586, 775),
-        "size": (267, 55)
+        "size": (559, 269)
     },
 
-    # START BUTTON HOVER
-    "start hover": {
-        "pos": (560, 748),
-        "size": (319, 108)
+    # Posisi teks pada panel Solver Performance
+    "solver_text_0": {
+        "pos": (900, 765),
+        "size": 26
     },
+    "solver_text_1": {
+        "pos": (900, 805),
+        "size": 26
+    },
+    "solver_text_2": {
+        "pos": (900, 845),
+        "size": 26
+    },
+    "solver_text_3": {
+        "pos": (900, 885),
+        "size": 26
+    },
+    "solver_text_4": {
+        "pos": (900, 925),
+        "size": 26
+    },
+
+    # =========================
+    # GAMEPLAY - BOARD
+    # =========================
+    # Posisi kiri atas papan permainan.
+    # Ini nilai awal sementara, perlu dicocokkan
+    # dengan background gameplay yang sebenarnya.
+    "blok lantai": (430, 250),
+
+    # Ukuran satu tile
+    "tile_size": 64,
+
+    # Posisi dan ukuran block berdiri
+    "blok berdiri": {
+        "pos": (0, 0),
+        "size": (64, 64)
+    },
+
+    # Posisi dan ukuran block tidur horizontal
+    "blok tidur": {
+        "pos": (0, 0),
+        "size": (128, 64)
+    },
+
+    # Posisi dan ukuran block tidur vertikal
+    "blok berdiri": {
+        "pos": (0, 0),
+        "size": (64, 128)
+    },
+
+    # =========================
+    # WIN / LOSE
+    # =========================
+    "menang": {
+        "pos": (400, 250),
+        "size": (640, 450)
+    },
+
+    # =========================
+    # PARTY PAGE
+    # =========================
+    "lantai party": {
+        "pos": (300, 500),
+        "size": (840, 400)
     }
 }
-
 
 # Mengatur ukuran dan posisi tile, block, serta goal.
 TILE_SIZE = (64, 64)
@@ -409,7 +515,8 @@ TILE_ASSETS = {
     "bridge": "blok lantai bridge",
     "goal": "blok lantai goal",
     "o": "blok lantai o",
-    "x": "blok lantai x"
+    "x": "blok lantai x",
+    "start": "blok berdiri"
 }
 
 BLOCK_ASSETS = {
@@ -422,6 +529,7 @@ BLOCK_ASSETS = {
         "name": "blok tidur",
         "size": (128, 64)
     }
+
 }
 
 PAGE_BACKGROUND_ASSETS = {
@@ -641,8 +749,11 @@ def draw_block(screen, posisi_block):
 
     if layout_key not in ASSET_LAYOUT:
         return
-
-    posisi, ukuran = ASSET_LAYOUT[layout_key]
+    
+    layout = ASSET_LAYOUT[layout_key]
+    posisi = layout["pos"]
+    ukuran = layout["size"]
+    
 
     gambar = pygame.transform.smoothscale(
         ASSETS[nama_asset],
@@ -690,7 +801,8 @@ def draw_solver_buttons(screen, data_game):
 
     daftar_solver = {
         "BFS": ("bfs idle", "bfs selected"),
-        "DFS": ("dfs idle", "dfs selected"),
+        "DFS": ("dfs idle", 
+        "dfs selected"),
         "UCS": ("ucs idle", "ucs selected")
     }
 
@@ -703,7 +815,7 @@ def draw_solver_buttons(screen, data_game):
         else:
             nama_asset = asset[0]
 
-        gambar_asset(screen,nama_asset,nama.lower())
+        gambar_asset(screen, nama_asset,nama.lower())
 
     # Menampilkan tombol Solve
     gambar_asset(screen,"solve","solve")
