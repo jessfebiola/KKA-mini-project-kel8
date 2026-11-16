@@ -307,14 +307,10 @@ def load_assets():
         else:
             print(f"Asset tidak ditemukan: {nama}")
 
-pass
-
-
 # ==================================================
 # MENGATUR POSISI DAN UKURAN ASSET
 # MEMBER 2
 # ==================================================
-
 
 # Mengatur posisi dan ukuran background.
 SCREEN_WIDTH = 1440
@@ -435,7 +431,10 @@ def gambar_asset(screen, nama, layout_key):
     if layout_key not in ASSET_LAYOUT:
         return
 
-    posisi, ukuran = ASSET_LAYOUT[layout_key]
+    layout = ASSET_LAYOUT[layout_key]
+
+    posisi = layout["pos"]
+    ukuran = layout["size"]
 
     gambar = ASSETS[nama]
 
@@ -465,7 +464,10 @@ def cek_hover(layout_key):
     if layout_key not in ASSET_LAYOUT:
         return False
 
-    posisi, ukuran = ASSET_LAYOUT[layout_key]
+    layout = ASSET_LAYOUT[layout_key]
+
+    posisi = layout["pos"]
+    ukuran = layout["size"]
 
     if ukuran is None:
         return False
@@ -501,29 +503,16 @@ def draw_landing(screen):
 
     # Menampilkan tombol Start sesuai kondisi hover
     if cek_hover("start"):
-
-        gambar_asset(
-            screen,
-            "start hover",
-            "start"
-        )
+        gambar_asset(screen,"start hover","start")
 
     else:
-
-        gambar_asset(
-            screen,
-            "start",
-            "start"
-        )
-
-    pass
-
+        gambar_asset(screen,"start","start")
 
 # ==================================================
 # MENAMPILKAN LEVEL SELECTION
 # ==================================================
 
-def draw_level_selection(screen):
+def draw_level_selection(screen, data_game):
 
     # Menampilkan background Level Selection.
     gambar_background(screen, "bg pilih level")
@@ -547,13 +536,7 @@ def draw_level_selection(screen):
         else:
             nama_asset = f"stage {level} idle"
 
-        gambar_asset(
-            screen,
-            nama_asset,
-            f"stage_{level}"
-        )
-
-    pass
+        gambar_asset(screen,nama_asset,f"stage_{level}")
 
 # ==================================================
 # MENGGAMBAR TILE
@@ -729,6 +712,7 @@ def draw_puzzle_guide(screen):
 # ==================================================
 # MENAMPILKAN SOLVER ALGORITMA SEARCH
 # ==================================================
+
 def draw_solver_performance(screen, data_game):
 # Membuat lapisan gelap di belakang pop-up
     overlay = pygame.Surface(
@@ -740,11 +724,7 @@ def draw_solver_performance(screen, data_game):
     screen.blit(overlay, (0, 0))
 
     # Menampilkan panel Solver Performance
-    gambar_asset(
-        screen,
-        "solver performance",
-        "solver_performance"
-    )
+    gambar_asset(screen,"solver performance","solver_performance")
 
     # Mengambil hasil pencarian dari solver.py
     hasil = data_game.get("solver_stats", {})
@@ -765,7 +745,9 @@ def draw_solver_performance(screen, data_game):
         if layout_key not in ASSET_LAYOUT:
             continue
 
-        posisi, ukuran = ASSET_LAYOUT[layout_key]
+        layout = ASSET_LAYOUT[layout_key]
+        posisi = layout["pos"]
+        ukuran = layout["size"]
 
         gambar_teks(
             screen,
