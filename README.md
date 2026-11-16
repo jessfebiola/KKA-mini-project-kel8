@@ -1,3 +1,13 @@
+## Anggota Kelompok
+
+| No. | Nama Anggota | NRP / NIM |
+|:--:|---|---|---|
+| 1 | Luthfir Rizqy Fathullah Hanggi | 5025251081 |
+| 2 | Yesenia Valencia W| 5025251182 | 
+| 3 | Claresta Amelinda H. | 5025251184 | 
+| 4 | Jessica Febiola| 5025251216 | 
+| 5 | I Made Bagus Naratama | 5025251233 | 
+
 # Roll to Vivat
 
 Roll to Vivat adalah game puzzle berbasis Python dan Pygame yang terinspirasi dari permainan Bloxorz. Pemain menggerakkan sebuah balok di atas papan untuk mencapai kotak tujuan tanpa terjatuh dari jalur. Game ini menyediakan tiga level dengan tantangan yang berbeda serta fitur Solver untuk mencari urutan gerakan secara otomatis.
@@ -110,3 +120,50 @@ Pastikan folder `assets/` tetap berada di dalam folder proyek agar gambar dan mu
 - Balok harus tetap berada di atas tile yang tersedia. Jika keluar dari jalur, permainan akan masuk ke halaman jumpscare.
 - Level 2 memiliki mekanisme switch untuk mengaktifkan jembatan.
 - Untuk menjalankan game, gunakan folder proyek secara utuh dan jangan memisahkan file Python dari folder `assets/`.
+
+## 📸 Dokumentasi
+### 1. Landing Page
+
+![alt text](image-1.png)
+*Tampilan awal Roll to Vivat dengan tombol Start.*
+
+### 2. Pemilihan Level
+
+![alt text](image-2.png)
+
+*Tampilan pemilihan tiga stage dengan sistem unlock.*
+
+### 3. Gameplay Level 1
+
+![alt text](image-3.png)
+
+*Pemain mengarahkan balok menuju petak tujuan.*
+
+### 4. Gameplay Level 2
+
+![alt text](image-4.png)
+
+*Tantangan tombol O dan X untuk membuka jembatan.*
+
+### 5. Gameplay Level 3
+
+![alt text](image-5.png)
+
+*Tantangan lintasan pada level terakhir.*
+
+### 6. Solver dan Statistik
+
+![alt text](image-6.png)
+
+*Pilihan Algoritma solver dan statistik hasil pencarian.*
+
+### 7. Ending / Party
+
+![alt text](image-7.png)
+
+*Tampilan akhir setelah pemain menyelesaikan permainan.*
+
+## Daftar Pustaka
+
+Clarke, D. (1999). Bloxorg [Video Game].https://www.coolmathgames.com/0-bloxorz?variant=next
+Iyer. S. (2012). Bloxorg. Github. https://github.com/supersaiyanmode/Bloxorz
