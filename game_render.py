@@ -402,7 +402,7 @@ ASSET_LAYOUT = {
 
 
 # Mengatur ukuran dan posisi tile, block, serta goal.
-TILE_SIZE = (64, 64)
+TILE_SIZE = 64
 
 TILE_ASSETS = {
     "normal": "blok lantai",
@@ -415,7 +415,7 @@ TILE_ASSETS = {
 BLOCK_ASSETS = {
     "standing": {
         "name": "blok berdiri",
-        "size": (64, 64)
+        "size": TILE_SIZE
     },
 
     "sleeping": {
@@ -515,10 +515,10 @@ def draw_landing(screen):
 
     # Menampilkan tombol Start sesuai kondisi hover
     if cek_hover("start"):
-        gambar_asset(screen,"start hover","start")
+        gambar_asset(screen, "start hover", "start hover")
 
     else:
-        gambar_asset(screen,"start","start")
+        gambar_asset(screen, "start", "start")
 
 # ==================================================
 # MENAMPILKAN LEVEL SELECTION
@@ -529,7 +529,7 @@ def draw_level_selection(screen, data_game):
     # Menampilkan background Level Selection.
     gambar_background(screen, "bg pilih level")
     # Menampilkan judul Pilih Level.
-    gambar_asset(screen,"pilih level","judul_level")
+    gambar_asset(screen, "pilih level", "judul_level")
     # Mengambil level tertinggi yang sudah terbuka
     unlocked_level = data_game.get("unlocked_level", 1)
 
@@ -548,7 +548,7 @@ def draw_level_selection(screen, data_game):
         else:
             nama_asset = f"stage {level} idle"
 
-        gambar_asset(screen,nama_asset,f"stage_{level}")
+        gambar_asset(screen, nama_asset, f"stage_{level}")
 
 # ==================================================
 # MENGGAMBAR TILE
@@ -569,11 +569,8 @@ def draw_tiles(screen, tiles):
     if "board_origin" not in ASSET_LAYOUT:
         return
 
-    if "tile_size" not in ASSET_LAYOUT:
-        return
-
-    origin = ASSET_LAYOUT["board_origin"]
-    tile_size = ASSET_LAYOUT["tile_size"]
+    origin = ASSET_LAYOUT["board_origin"]["pos"]
+    tile_size = TILE_SIZE
 
     # Menggambar tile berdasarkan koordinat LEVELS
     for koordinat, jenis in tiles.items():
@@ -602,82 +599,33 @@ def draw_tiles(screen, tiles):
 # MENGGAMBAR BLOCK
 # ==================================================
 
-def draw_block(screen, posisi_block):
+def draw_block(screen, state):
+    (r1, c1), (r2, c2) = state
 
-    if posisi_block is None:
-        return
+    if (r1, c1) == (r2, c2):
+        # Block berdiri
+        gambar = ASSETS["blok berdiri"]
+        ukuran = (64, 64)
 
-    # Block dalam posisi berdiri
-    if isinstance(posisi_block[0], int):
-
-        if "standing_block" not in ASSET_LAYOUT:
-            return
-
-        layout_key = "standing_block"
-        nama_asset = "blok berdiri"
-
-    # Block dalam posisi tidur
-    else:
-
-        titik_1, titik_2 = posisi_block
-
-        x1, y1 = titik_1
-        x2, y2 = titik_2
-
+    elif r1 == r2:
         # Block tidur horizontal
-        if y1 == y2:
-
-            layout_key = "horizontal_block"
-
-        # Block tidur vertikal
-        else:
-
-            layout_key = "vertical_block"
-
-        nama_asset = "blok tidur"
-
-    if nama_asset not in ASSETS:
-        return
-
-    if layout_key not in ASSET_LAYOUT:
-        return
-
-    posisi, ukuran = ASSET_LAYOUT[layout_key]
-
-    gambar = pygame.transform.smoothscale(
-        ASSETS[nama_asset],
-        ukuran
-    )
-
-    # Mengikuti posisi koordinat block
-    if isinstance(posisi_block[0], int):
-
-        x, y = posisi_block
+        gambar = ASSETS["blok tidur"]
+        ukuran = (128, 64)
 
     else:
+        # Block tidur vertikal
+        gambar = pygame.transform.rotate(
+            ASSETS["blok tidur"], 90
+        )
+        ukuran = (64, 128)
 
-        titik_1, titik_2 = posisi_block
+    gambar = pygame.transform.scale(gambar, ukuran)
 
-        x = min(titik_1[0], titik_2[0])
-        y = min(titik_1[1], titik_2[1])
+    # Menentukan posisi block berdasarkan koordinat
+    x = BOARD_ORIGIN[0] + min(c1, c2) * TILE_SIZE
+    y = BOARD_ORIGIN[1] + min(r1, r2) * TILE_SIZE
 
-    origin = ASSET_LAYOUT.get("board_origin")
-
-    if origin is None:
-        return
-
-    tile_size = ASSET_LAYOUT.get("tile_size")
-
-    if tile_size is None:
-        return
-
-    posisi_block_layar = (
-        origin[0] + x * tile_size,
-        origin[1] + y * tile_size
-    )
-
-    screen.blit(gambar, posisi_block_layar)
-
+    screen.blit(gambar, (x, y))
 
 # ==================================================
 # MENAMPILKAN TOMBOL SOLVER
@@ -703,7 +651,7 @@ def draw_solver_buttons(screen, data_game):
         else:
             nama_asset = asset[0]
 
-        gambar_asset(screen,nama_asset,nama.lower())
+        gambar_asset(screen, nama_asset, nama_asset)
 
     # Menampilkan tombol Solve
     gambar_asset(screen,"solve","solve")
@@ -718,7 +666,7 @@ def draw_puzzle_guide(screen):
     gambar_asset(
         screen,
         "puzzle guide",
-        "puzzle_guide"
+        "puzzle guide"
     )
 
 # ==================================================
@@ -736,7 +684,7 @@ def draw_solver_performance(screen, data_game):
     screen.blit(overlay, (0, 0))
 
     # Menampilkan panel Solver Performance
-    gambar_asset(screen,"solver performance","solver_performance")
+    gambar_asset(screen,"solver performance","solver performance")
 
     # Mengambil hasil pencarian dari solver.py
     hasil = data_game.get("solver_stats", {})
@@ -832,6 +780,8 @@ def draw_party(screen):
 # ==================================================
 
 def draw_page(screen, data_game):
+    if not ASSETS:
+        load_assets()
 
     page = data_game["page"]
 
@@ -839,12 +789,13 @@ def draw_page(screen, data_game):
         draw_landing(screen)
 
     elif page == "level_select":
-        draw_level_selection(screen)
+        draw_level_selection(screen, data_game)
 
     elif page == "gameplay":
         draw_gameplay(screen, data_game)
 
     elif page == "win":
+        draw_gameplay(screen, data_game)
         draw_win(screen)
 
     elif page == "jumpscare":
