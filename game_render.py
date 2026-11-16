@@ -384,7 +384,19 @@ ASSET_LAYOUT = {
     # SOLVER PERFORMANCE
     "solver performance": {
         "pos": (853, 727),
-        "size": (559, 269)
+        "size": (559, 269),
+
+    # START BUTTON
+    "start": {
+        "pos": (586, 775),
+        "size": (267, 55)
+    },
+
+    # START BUTTON HOVER
+    "start hover": {
+        "pos": (560, 748),
+        "size": (319, 108)
+    },
     }
 }
 
