@@ -332,8 +332,8 @@ ASSET_LAYOUT = {
     },
 
     "jahim": {
-    "pos": (590, 318),
-    "size": (260, 295)
+        "pos": (545, 300),
+        "size": (350, 420)
     },
 
     "start": {
@@ -357,42 +357,42 @@ ASSET_LAYOUT = {
     },
 
     "stage 1 idle": {
-        "pos": (0, 380),
+        "pos": (0, 370),
         "size": (600, 600)
     },
 
     "stage 1 selected": {
-        "pos": (0, 380),
+        "pos": (0, 370),
         "size": (600, 600)
     },
 
     "stage 2 idle": {
-        "pos": (420, 380),
+        "pos": (420, 260),
         "size": (600, 600)
     },
 
     "stage 2 locked": {
-        "pos": (420, 380),
+        "pos": (420, 260),
         "size": (600, 600)
     },
 
     "stage 2 selected": {
-        "pos": (420, 380),
+        "pos": (420, 260),
         "size": (600, 600)
     },
 
     "stage 3 idle": {
-        "pos": (840, 380),
+        "pos": (840, 170),
         "size": (600, 600)
     },
 
     "stage 3 locked": {
-        "pos": (840, 380),
+        "pos": (840, 170),
         "size": (600, 600)
     },
 
     "stage 3 selected": {
-        "pos": (840, 380),
+        "pos": (840, 170),
         "size": (600, 600)
     },
 
@@ -993,8 +993,10 @@ def draw_party(screen):
     kolase = ASSETS.get("lantai party")
     if kolase is not None:
         kw, kh = kolase.get_size()
-        area_w = int(lebar_layar * 0.90)
-        area_h = int(tinggi_layar * 0.90)
+        # Referensi gambar kedua: kolase sekitar 64% lebar dan 60% tinggi layar.
+        # Tetap menjaga rasio asli asset agar tidak penyet.
+        area_w = int(lebar_layar * 0.64)
+        area_h = int(tinggi_layar * 0.60)
         skala = min(area_w / kw, area_h / kh)
         ukuran = (max(1, round(kw * skala)),
                   max(1, round(kh * skala)))
@@ -1008,6 +1010,7 @@ def draw_party(screen):
             center=(lebar_layar // 2, tinggi_layar // 2)
         )
         screen.blit(gambar_kolase, posisi)
+
 
 
 # ==================================================
