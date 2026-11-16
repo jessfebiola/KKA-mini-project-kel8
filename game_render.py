@@ -335,7 +335,6 @@ ASSET_LAYOUT = {
         "pos": (545, 300),
         "size": (350, 420)
     },
-
     "start": {
     "pos": (586, 775),
     "size": (267, 55)
@@ -707,10 +706,11 @@ def draw_level_selection(screen, data_game):
 # MENGGAMBAR TILE
 # ==================================================
 
-def draw_tiles(screen, tiles):
+def draw_tiles(screen, tiles, origin=None):
 
     # Mengambil posisi awal papan
-    origin = ASSET_LAYOUT["blok lantai"]
+    if origin is None:
+        origin = ASSET_LAYOUT["blok lantai"]
     tile_size = TILE_SIZE
 
     # Menggambar tile berdasarkan koordinat LEVELS
@@ -753,7 +753,7 @@ def draw_tiles(screen, tiles):
 # MENGGAMBAR BLOCK
 # ==================================================
 
-def draw_block(screen, state):
+def draw_block(screen, state, origin=None):
 
 
     if state is None:
@@ -761,7 +761,8 @@ def draw_block(screen, state):
 
     (x1, y1), (x2, y2) = state
 
-    origin = ASSET_LAYOUT["blok lantai"]
+    if origin is None:
+        origin = ASSET_LAYOUT["blok lantai"]
     tile_size = TILE_SIZE
 
     # Block berdiri
@@ -899,6 +900,13 @@ def draw_gameplay(screen, data_game):
 
     data_level = LEVELS[level]
 
+    # Posisi papan per level mengikuti gambar referensi; koordinat game tidak berubah.
+    board_origin = {
+        1: (375, 359),
+        2: (257, 323),
+        3: (230, 317),
+    }.get(level, ASSET_LAYOUT["blok lantai"])
+
     # Menampilkan background sesuai level
     gambar_background(
         screen,
@@ -912,14 +920,16 @@ def draw_gameplay(screen, data_game):
          if kind != "bridge" or (
              (pos[0] in (4, 5) and data_game.get("bridge_o_open", False)) or
              (pos[0] in (10, 11) and data_game.get("bridge_x_open", False))
-         )}
+         )},
+        origin=board_origin
     )
 
     # Menggambar block sesuai posisi dan orientasi
     if data_game.get("posisi_block") is not None:
         draw_block(
             screen,
-            data_game["posisi_block"]
+            data_game["posisi_block"],
+            origin=board_origin
         )
 
     # Menampilkan tombol Solver
@@ -993,8 +1003,6 @@ def draw_party(screen):
     kolase = ASSETS.get("lantai party")
     if kolase is not None:
         kw, kh = kolase.get_size()
-        # Referensi gambar kedua: kolase sekitar 64% lebar dan 60% tinggi layar.
-        # Tetap menjaga rasio asli asset agar tidak penyet.
         area_w = int(lebar_layar * 0.64)
         area_h = int(tinggi_layar * 0.60)
         skala = min(area_w / kw, area_h / kh)
@@ -1010,7 +1018,6 @@ def draw_party(screen):
             center=(lebar_layar // 2, tinggi_layar // 2)
         )
         screen.blit(gambar_kolase, posisi)
-
 
 
 # ==================================================
