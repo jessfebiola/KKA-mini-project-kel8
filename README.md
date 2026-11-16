@@ -144,27 +144,28 @@ Pastikan folder `assets/` tetap berada di dalam folder proyek agar gambar dan mu
 
 ### 4. Gameplay Level 2
 
-<img width="1371" height="986" alt="image" src="https://github.com/user-attachments/assets/b49765b7-8be3-4328-9722-473f37dd65aa" />
+<img width="1381" height="955" alt="image" src="https://github.com/user-attachments/assets/d5d624b8-c254-4bc5-9360-4ad21dca861d" />
+
 
 *Tantangan tombol O dan X untuk membuka jembatan.*
 
 ### 5. Gameplay Level 3
 
-<img width="1371" height="986" alt="image" src="https://github.com/user-attachments/assets/7271ee5e-d858-40bc-b471-e50436936f72" />
+<img width="1380" height="980" alt="image" src="https://github.com/user-attachments/assets/30cd66ef-f7a5-45fc-a0d2-380bcc8e2868" />
 
 
 *Tantangan lintasan pada level terakhir.*
 
 ### 6. Solver dan Statistik
 
-<img width="1371" height="986" alt="image" src="https://github.com/user-attachments/assets/b86c9691-6b37-4c69-a326-79ea5e663be6" />
+<img width="1440" height="982" alt="image" src="https://github.com/user-attachments/assets/9c621cac-0f05-4010-ae85-aadf8837c510" />
 
 
 *Pilihan Algoritma solver dan statistik hasil pencarian.*
 
 ### 7. Ending / Party
 
-<img width="1371" height="986" alt="image" src="https://github.com/user-attachments/assets/e9eb016a-212c-497d-9c11-2e39d04d1964" />
+<img width="1392" height="983" alt="image" src="https://github.com/user-attachments/assets/dbb5a741-ee92-4a19-9c03-a0b4a52d00e2" />
 
 
 *Tampilan akhir setelah pemain menyelesaikan permainan.*
