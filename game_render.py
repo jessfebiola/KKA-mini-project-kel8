@@ -315,14 +315,112 @@ pass
 # MEMBER 2
 # ==================================================
 
-# Mengatur posisi dan ukuran background.
-# Mengatur posisi tombol Start, Setting, dan Credit.
-# Mengatur posisi tombol Solve, BFS, DFS, dan UCS.
-# Mengatur posisi Puzzle Guide.
-# Mengatur posisi Solver Performance.
-# Mengatur ukuran dan posisi tile, block, serta goal.
 
-pass
+# Mengatur posisi dan ukuran background.
+SCREEN_WIDTH = 1440
+SCREEN_HEIGHT = 1024 
+
+BACKGROUND_SIZE = (SCREEN_WIDTH, SCREEN_HEIGHT)
+
+BACKGROUND_ASSETS = {
+    1: "bg lvl 1",
+    2: "bg lvl 2",
+    3: "bg lvl 3"
+}
+
+JUMPSCARE_BACKGROUND_ASSETS = {
+    1: "bg js lvl 1",
+    2: "bg js lvl 2",
+    3: "bg js lvl 3"
+}
+
+# Mengatur posisi tombol Start
+# Mengatur posisi tombol Solve, BFS, DFS, dan UCS.
+# # Mengatur posisi Puzzle Guide.
+# Mengatur posisi Solver Performance.
+ASSET_LAYOUT = {
+
+    # SOLVE
+    "solve": {
+        "pos": (1212, 30),
+        "size": (198, 69)
+    },
+
+    # BFS
+    "bfs idle": {
+        "pos": (28, 558),
+        "size": (138, 54)
+    },
+
+    "bfs selected": {
+        "pos": (28, 558),
+        "size": (138, 54)
+    },
+
+    # DFS
+    "dfs idle": {
+        "pos": (28, 628),
+        "size": (138, 54)
+    },
+
+    "dfs selected": {
+        "pos": (28, 628),
+        "size": (138, 54)
+    },
+
+    # UCS
+    "ucs idle": {
+        "pos": (28, 698),
+        "size": (138, 54)
+    },
+
+    "ucs selected": {
+        "pos": (28, 698),
+        "size": (138, 54)
+    },
+
+    # PUZZLE GUIDE
+    "puzzle guide": {
+        "pos": (28, 768),
+        "size": (373, 226)
+    },
+
+    # SOLVER PERFORMANCE
+    "solver performance": {
+        "pos": (853, 727),
+        "size": (559, 269)
+    }
+}
+
+
+# Mengatur ukuran dan posisi tile, block, serta goal.
+TILE_SIZE = (64, 64)
+
+TILE_ASSETS = {
+    "normal": "blok lantai",
+    "bridge": "blok lantai bridge",
+    "goal": "blok lantai goal",
+    "o": "blok lantai o",
+    "x": "blok lantai x"
+}
+
+BLOCK_ASSETS = {
+    "standing": {
+        "name": "blok berdiri",
+        "size": (64, 64)
+    },
+
+    "sleeping": {
+        "name": "blok tidur",
+        "size": (128, 64)
+    }
+}
+
+PAGE_BACKGROUND_ASSETS = {
+    "landing": "bg landing",
+    "level_select": "bg pilih level",
+    "party": "bg party"
+}
 
 # ==================================================
 # FUNGSI BANTUAN TAMPILAN
