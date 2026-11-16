@@ -10,7 +10,7 @@ from game_render import draw_page, LEVELS, set_virtual_mouse_pos
 
 # Mengambil fungsi mekanisme game
 # dari game_logic.py
-from game_logic import move_block as move_block_rc, check_fall, check_win
+from game_logic import move_block, check_fall, check_win, update_bridges
 
 # Mengambil algoritma pencarian
 # dari solver.py
@@ -160,9 +160,7 @@ def mulai_level(level):
 
 # LEVEL 2: koordinat internal papan (x, y), logic lama memakai (baris, kolom).
 def gerakkan_xy(state, arah):
-    rc = tuple((y, x) for x, y in state)
-    hasil = move_block_rc(rc, arah)
-    return tuple((c, r) for r, c in hasil)
+    return move_block(state, arah)
 
 
 def normalisasi(state):
@@ -340,16 +338,20 @@ def gerak_pemain(event):
     # Mengambil posisi block saat ini
     posisi_sekarang = data_game["posisi_block"]
     # Menghitung posisi block setelah bergerak
-    # game_logic menggunakan (baris, kolom), sedangkan LEVELS dan render (x, y).
-    # Konversi dua arah agar tombol panah bergerak sesuai layar.
-    posisi_rc = tuple((y, x) for x, y in posisi_sekarang)
-    hasil_rc = move_block_rc(posisi_rc, direction)
-    posisi_baru = tuple((kolom, baris) for baris, kolom in hasil_rc)
+    posisi_baru = move_block(posisi_sekarang, direction)
     # Menyimpan posisi baru
     data_game["posisi_block"] = posisi_baru
+    # Mengaktifkan bridge jika switch Level 2 terinjak
     if data_game["level"] == 2:
-        bo, bx = tekan_switch_level2(posisi_baru, data_game["bridge_o_open"], data_game["bridge_x_open"], posisi_sekarang)
-        data_game["bridge_o_open"], data_game["bridge_x_open"] = bo, bx
+        bo, bx = update_bridges(
+            posisi_baru,
+            LEVELS[2]["tiles"],
+            data_game["bridge_o_open"],
+            data_game["bridge_x_open"]
+        )
+
+        data_game["bridge_o_open"] = bo
+        data_game["bridge_x_open"] = bx
 
 def cek_game():
 
