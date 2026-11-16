@@ -1,7 +1,8 @@
 ## Anggota Kelompok
 
-| No. | Nama Anggota | NRP / NIM |
-|:--:|---|---|---|
+| No           | Name        | NRP     |
+| ---            | ---        | ----------|
+|  |  |  |
 | 1 | Luthfir Rizqy Fathullah Hanggi | 5025251081 |
 | 2 | Yesenia Valencia W| 5025251182 | 
 | 3 | Claresta Amelinda H. | 5025251184 | 
@@ -124,42 +125,47 @@ Pastikan folder `assets/` tetap berada di dalam folder proyek agar gambar dan mu
 ## 📸 Dokumentasi
 ### 1. Landing Page
 
-![alt text](image-1.png)
+<img width="1388" height="988" alt="image" src="https://github.com/user-attachments/assets/b5217b91-2a53-4228-8913-428cae9d542f" />
+
 *Tampilan awal Roll to Vivat dengan tombol Start.*
 
 ### 2. Pemilihan Level
 
-![alt text](image-2.png)
+<img width="1381" height="982" alt="image" src="https://github.com/user-attachments/assets/ab2eb3c7-5970-48a1-80d9-52191db47a5a" />
 
 *Tampilan pemilihan tiga stage dengan sistem unlock.*
 
 ### 3. Gameplay Level 1
 
-![alt text](image-3.png)
+<img width="1371" height="986" alt="image" src="https://github.com/user-attachments/assets/ac667f66-5d82-432a-9c7a-b47235088841" />
+
 
 *Pemain mengarahkan balok menuju petak tujuan.*
 
 ### 4. Gameplay Level 2
 
-![alt text](image-4.png)
+<img width="1371" height="986" alt="image" src="https://github.com/user-attachments/assets/b49765b7-8be3-4328-9722-473f37dd65aa" />
 
 *Tantangan tombol O dan X untuk membuka jembatan.*
 
 ### 5. Gameplay Level 3
 
-![alt text](image-5.png)
+<img width="1371" height="986" alt="image" src="https://github.com/user-attachments/assets/7271ee5e-d858-40bc-b471-e50436936f72" />
+
 
 *Tantangan lintasan pada level terakhir.*
 
 ### 6. Solver dan Statistik
 
-![alt text](image-6.png)
+<img width="1371" height="986" alt="image" src="https://github.com/user-attachments/assets/b86c9691-6b37-4c69-a326-79ea5e663be6" />
+
 
 *Pilihan Algoritma solver dan statistik hasil pencarian.*
 
 ### 7. Ending / Party
 
-![alt text](image-7.png)
+<img width="1371" height="986" alt="image" src="https://github.com/user-attachments/assets/e9eb016a-212c-497d-9c11-2e39d04d1964" />
+
 
 *Tampilan akhir setelah pemain menyelesaikan permainan.*
 
