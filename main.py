@@ -1,4 +1,5 @@
 import pygame
+from pathlib import Path
 
 # Mengambil fungsi tampilan dan data level
 # dari game_render.py
@@ -19,6 +20,7 @@ from solver import bfs, dfs, ucs
 # ==================================================
 
 pygame.init()
+pygame.mixer.init()
 
 # Ukuran layar mengikuti frame Figma
 screen = pygame.display.set_mode((1440, 1024))
@@ -35,14 +37,82 @@ data_game = {
     "level": None,              # Level yang dipilih
     "posisi_block": None,       # Posisi block saat ini
     "status": "playing",        # Kondisi permainan
+    "unlocked_level":1,
 
     # Data Solver
     "solver_method": None,      # Algoritma yang dipilih: BFS, DFS, UCS
     "solver_result": [],        # Hasil urutan gerakan Solver
     "solver_index": 0,          # Urutan gerakan yang sedang dijalankan
     "solver_running": False,    # Status Solver
-    "solver_last_time": 0       # Waktu gerakan Solver terakhir
+    "solver_last_time": 0,     # Waktu gerakan Solver terakhir
+    "solver_stats":{},
+    "solver_show_performance":False
 }
+
+# ==================================================
+# MENGATUR SOUND
+# MEMBER 1
+# ==================================================
+ASSETS_DIR = Path(__file__).parent / "assets" / "bgsound"
+
+def cari_sound(nama):
+    for file in ASSETS_DIR.rglob("*"):
+
+        if file.is_file() and file.stem == nama:
+            return file
+
+    print(f"Sound tidak ditemukan: {nama}")
+    return None
+
+SOUND_GAME = cari_sound("bgsound full 3")
+SOUND_PARTY = cari_sound("party bgsound")
+
+SOUND_JUMPSCARE = {
+    1: cari_sound("bgsound js lvl 1"),
+    2: cari_sound("bgsound js lvl 2"),
+    3: cari_sound("bgsound js lvl 3")
+}
+
+def atur_sound():
+
+    global musik_aktif
+
+    # Memilih musik berdasarkan halaman
+    if data_game["page"] == "gameplay":
+        musik_baru = SOUND_GAME
+
+    elif data_game["page"] == "party":
+        musik_baru = SOUND_PARTY
+
+    else:
+        musik_baru = None
+
+    # Mengganti musik jika halaman berubah
+    if musik_baru != musik_aktif:
+
+        pygame.mixer.music.stop()
+        musik_aktif = musik_baru
+
+        if musik_aktif is not None:
+
+            pygame.mixer.music.load(str(musik_aktif))
+            pygame.mixer.music.play(-1)
+
+
+def putar_jumpscare():
+
+    # Mengambil jumpscare sesuai level
+    level = data_game["level"]
+    sound = SOUND_JUMPSCARE.get(level)
+
+    if sound is not None:
+
+        # Menghentikan background music
+        pygame.mixer.music.stop()
+
+        # Memutar sound jumpscare
+        pygame.mixer.Sound(str(sound)).play()
+
 
 
 # ==================================================
@@ -58,6 +128,7 @@ def atur_menu(event):
     # Mengambil data level dari LEVELS di game_render.py.
     # Mengatur posisi awal block ketika level dimulai.
     # Mengatur tombol Back, Restart, dan Next Level.
+
 
     pass
 
@@ -114,14 +185,23 @@ def cek_game():
 
     # Cek apakah block jatuh
     if check_fall(posisi_block, tiles):
+
         data_game["status"] = "lose"
-        data_game["page"] = "lose"
+        data_game["page"] = "jumpscare"
+        data_game["solver_running"] = False
+        data_game["solver_show_performance"] = False
+
+        # Memutar jumpscare sesuai level
+        putar_jumpscare()
         return
 
     # Cek apakah block mencapai goal
     if check_win(posisi_block, goal):
+
         data_game["status"] = "win"
         data_game["page"] = "win"
+        data_game["solver_running"] = False
+        data_game["solver_show_performance"] = False
 
 
 # ==================================================
@@ -183,11 +263,14 @@ while running:
     # C. MENJALANKAN SOLVER
     gerak_solver()
 
-    # D. MENAMPILKAN PAGE
+    # D. MENGATUR SOUND
+    atur_sound()
+
+    # E. MENAMPILKAN PAGE
     # Memanggil draw_page() dari game_render.py
     draw_page(screen, data_game)
 
-    # E. MEMPERBARUI TAMPILAN
+    # F. MEMPERBARUI TAMPILAN
     pygame.display.flip()
 
     # Membatasi game menjadi 60 FPS
@@ -195,4 +278,5 @@ while running:
 
 
 # Menutup Pygame
+pygame.mixer.music.stop()
 pygame.quit()
