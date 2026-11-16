@@ -1,5 +1,8 @@
 import pygame
 from pathlib import Path
+from collections import deque
+import heapq
+import time
 
 # Mengambil fungsi tampilan dan data level
 # dari game_render.py
@@ -38,6 +41,7 @@ data_game = {
     "posisi_block": None,       # Posisi block saat ini
     "status": "playing",        # Kondisi permainan
     "unlocked_level":1,
+    "bridge_o_open": False, "bridge_x_open": False,
 
     # Data Solver
     "solver_method": None,      # Algoritma yang dipilih: BFS, DFS, UCS
@@ -130,8 +134,100 @@ def mulai_level(level):
         "posisi_block": (start, start), "status": "playing",
         "solver_method": None, "solver_result": [], "solver_index": 0,
         "solver_running": False, "solver_last_time": 0,
-        "solver_stats": {}, "solver_show_performance": False
+        "solver_stats": {}, "solver_show_performance": False,
+        "bridge_o_open": False, "bridge_x_open": False
     })
+
+
+# LEVEL 2: koordinat internal papan (x, y), logic lama memakai (baris, kolom).
+def gerakkan_xy(state, arah):
+    rc = tuple((y, x) for x, y in state)
+    hasil = move_block_rc(rc, arah)
+    return tuple((c, r) for r, c in hasil)
+
+
+def normalisasi(state):
+    return tuple(sorted(state))
+
+
+def jembatan_aktif(pos, o_open, x_open):
+    x, y = pos
+    if y != 4:
+        return True
+    if x in (4, 5):
+        return o_open
+    if x in (10, 11):
+        return x_open
+    return True
+
+
+def posisi_aman_level2(state, o_open, x_open):
+    tiles = LEVELS[2]["tiles"]
+    return all(pos in tiles and jembatan_aktif(pos, o_open, x_open) for pos in state)
+
+
+def tekan_switch_level2(state, o_open, x_open, sebelumnya=None):
+    # Tombol hanya aktif saat baru diinjak, bukan setiap frame.
+    sebelum = set(sebelumnya or ())
+    sekarang = set(state)
+    if (2, 2) in sekarang and (2, 2) not in sebelum:
+        o_open = True
+    if state[0] == state[1] == (8, 1) and sebelumnya != state:
+        x_open = True
+    return o_open, x_open
+
+
+def terapkan_gerakan(state, arah, o_open, x_open):
+    baru = normalisasi(gerakkan_xy(state, arah))
+    o_open, x_open = tekan_switch_level2(baru, o_open, x_open, state)
+    return baru, o_open, x_open
+
+
+def cari_solusi_level2(start_state, metode, o_open=False, x_open=False):
+    # BFS/DFS/UCS dengan state jembatan; solver.py tetap milik Member 4.
+    awal_waktu = time.perf_counter()
+    awal = (normalisasi(start_state), o_open, x_open)
+    parents = {awal: None}
+    expanded = 0
+    urutan = ("UP", "DOWN", "LEFT", "RIGHT")
+    if metode == "UCS":
+        frontier = [(0, 0, awal)]
+        counter = 0
+    else:
+        frontier = deque([awal]) if metode == "BFS" else [awal]
+    while frontier:
+        if metode == "UCS":
+            _, _, node = heapq.heappop(frontier)
+        elif metode == "BFS":
+            node = frontier.popleft()
+        else:
+            node = frontier.pop()
+        state, bo, bx = node
+        expanded += 1
+        if state[0] == state[1] == LEVELS[2]["goal"]:
+            path = []
+            while parents[node] is not None:
+                parent, arah = parents[node]
+                path.append(arah)
+                node = parent
+            path.reverse()
+            return {"algorithm": metode, "path": path, "discovered": len(parents),
+                    "expanded": expanded, "time": time.perf_counter()-awal_waktu}
+        for arah in urutan:
+            baru, no, nx = terapkan_gerakan(state, arah, bo, bx)
+            if not posisi_aman_level2(baru, no, nx):
+                continue
+            next_node = (baru, no, nx)
+            if next_node in parents:
+                continue
+            parents[next_node] = (node, arah)
+            if metode == "UCS":
+                counter += 1
+                heapq.heappush(frontier, (len(parents), counter, next_node))
+            else:
+                frontier.append(next_node)
+    return {"algorithm": metode, "path": [], "discovered": len(parents),
+            "expanded": expanded, "time": time.perf_counter()-awal_waktu}
 
 
 def atur_menu(event):
@@ -226,6 +322,9 @@ def gerak_pemain(event):
     posisi_baru = tuple((kolom, baris) for baris, kolom in hasil_rc)
     # Menyimpan posisi baru
     data_game["posisi_block"] = posisi_baru
+    if data_game["level"] == 2:
+        bo, bx = tekan_switch_level2(posisi_baru, data_game["bridge_o_open"], data_game["bridge_x_open"], posisi_sekarang)
+        data_game["bridge_o_open"], data_game["bridge_x_open"] = bo, bx
 
 def cek_game():
 
@@ -246,7 +345,8 @@ def cek_game():
     goal = LEVELS[level]["goal"]
 
     # Cek apakah block jatuh
-    if check_fall(posisi_block, tiles):
+    if (not posisi_aman_level2(posisi_block, data_game["bridge_o_open"], data_game["bridge_x_open"])
+            if level == 2 else check_fall(posisi_block, tiles)):
 
         data_game["status"] = "lose"
         data_game["page"] = "jumpscare"
@@ -259,6 +359,7 @@ def cek_game():
 
     # Cek apakah block mencapai goal
     if check_win(posisi_block, goal):
+        data_game["unlocked_level"] = max(data_game["unlocked_level"], min(level + 1, max(LEVELS)))
 
         # Solver selesai: tetap di gameplay agar panel statistik terlihat.
         if data_game.get("solver_method") and data_game.get("solver_result") and data_game["solver_index"] >= len(data_game["solver_result"]):
@@ -319,7 +420,9 @@ def pilih_solver(event):
     }
 
     fungsi = {"BFS": bfs, "DFS": dfs, "UCS": ucs}[metode]
-    hasil = fungsi(state_rc, level_rc)
+    hasil = (cari_solusi_level2(data_game["posisi_block"], metode,
+                              data_game["bridge_o_open"], data_game["bridge_x_open"])
+             if level == 2 else fungsi(state_rc, level_rc))
     data_game["solver_stats"] = hasil
     data_game["solver_result"] = hasil.get("path", [])
     data_game["solver_index"] = 0
@@ -354,6 +457,9 @@ def gerak_solver():
     state_rc = tuple((y0, x0) for x0, y0 in state_xy)
     hasil_rc = move_block_rc(state_rc, arah)
     data_game["posisi_block"] = tuple((kolom, baris) for baris, kolom in hasil_rc)
+    if data_game["level"] == 2:
+        bo, bx = tekan_switch_level2(data_game["posisi_block"], data_game["bridge_o_open"], data_game["bridge_x_open"], state_xy)
+        data_game["bridge_o_open"], data_game["bridge_x_open"] = bo, bx
     data_game["solver_index"] += 1
     data_game["solver_last_time"] = sekarang
 

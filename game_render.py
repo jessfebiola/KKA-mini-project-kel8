@@ -726,6 +726,13 @@ def draw_tiles(screen, tiles):
         gambar = TILE_CACHE[cache_key]
 
         screen.blit(gambar, posisi)
+        # Goal Level 2 menggunakan satu petak hijau, bukan biru.
+        if jenis == "goal":
+            inset = max(4, tile_size // 12)
+            kotak = pygame.Rect(posisi[0] + inset, posisi[1] + inset,
+                                tile_size - 2 * inset, tile_size - 2 * inset)
+            pygame.draw.rect(screen, (36, 170, 73), kotak, border_radius=7)
+            pygame.draw.rect(screen, (19, 93, 46), kotak, 3, border_radius=7)
 
 
 # ==================================================
@@ -887,7 +894,11 @@ def draw_gameplay(screen, data_game):
     # Menggambar tile berdasarkan koordinat
     draw_tiles(
         screen,
-        data_level["tiles"]
+        {pos: ("normal" if kind == "bridge" else kind) for pos, kind in data_level["tiles"].items()
+         if kind != "bridge" or (
+             (pos[0] in (4, 5) and data_game.get("bridge_o_open", False)) or
+             (pos[0] in (10, 11) and data_game.get("bridge_x_open", False))
+         )}
     )
 
     # Menggambar block sesuai posisi dan orientasi
