@@ -204,6 +204,8 @@ ASSET_DIR = Path(__file__).parent / "assets"
 
 # Menyimpan gambar yang sudah dipanggil
 ASSETS = {}
+TILE_CACHE = {}
+ASSET_SCALE_CACHE = {}
 
 
 def load_assets():
@@ -329,9 +331,14 @@ ASSET_LAYOUT = {
         "size": (540, 250)
     },
 
+    "jahim": {
+    "pos": (590, 450),
+    "size": (260, 280)
+    },
+
     "start": {
-        "pos": (586, 775),
-        "size": (267, 55)
+    "pos": (586, 775),
+    "size": (267, 55)
     },
 
     "start hover": {
@@ -575,9 +582,10 @@ def gambar_asset(screen, nama, layout_key):
     gambar = ASSETS[nama]
 
     if ukuran is not None:
-        gambar = pygame.transform.smoothscale(
-            gambar, ukuran
-        )
+        key = (nama, tuple(ukuran))
+        if key not in ASSET_SCALE_CACHE:
+            ASSET_SCALE_CACHE[key] = pygame.transform.smoothscale(gambar, ukuran)
+        gambar = ASSET_SCALE_CACHE[key]
 
     screen.blit(gambar, posisi)
 
@@ -588,12 +596,10 @@ def gambar_background(screen, nama):
     if nama not in ASSETS:
         return
 
-    background = pygame.transform.smoothscale(
-        ASSETS[nama],
-        screen.get_size()
-    )
-
-    screen.blit(background, (0, 0))
+    key = (nama, screen.get_size())
+    if key not in ASSET_SCALE_CACHE:
+        ASSET_SCALE_CACHE[key] = pygame.transform.smoothscale(ASSETS[nama], screen.get_size())
+    screen.blit(ASSET_SCALE_CACHE[key], (0, 0))
 
 
 # Mengecek posisi kursor pada tombol
@@ -646,6 +652,8 @@ def draw_landing(screen):
         "roll to vivat kuning",
         "roll to vivat kuning"
     )
+    # Tmbahin jahim
+    gambar_asset(screen, "jahim", "jahim")
 
     # Menampilkan tombol Start sesuai kondisi hover
     if cek_hover("start"):
@@ -719,11 +727,11 @@ def draw_tiles(screen, tiles):
     # Menggambar tile berdasarkan koordinat LEVELS
     for koordinat, jenis in tiles.items():
 
-        baris, kolom = koordinat
+        x, y = koordinat
 
         posisi = (
-            origin[0] + kolom * tile_size,
-            origin[1] + baris * tile_size
+            origin[0] + x * tile_size,
+            origin[1] + y * tile_size
         )
 
         nama_asset = TILE_ASSETS.get(jenis)
@@ -731,10 +739,16 @@ def draw_tiles(screen, tiles):
         if nama_asset not in ASSETS:
             continue
 
-        gambar = pygame.transform.smoothscale(
-            ASSETS[nama_asset],
-            (tile_size, tile_size)
-        )
+        # Menyimpan hasil resize agar tidak diulang setiap frame
+        cache_key = (nama_asset, tile_size)
+
+        if cache_key not in TILE_CACHE:
+            TILE_CACHE[cache_key] = pygame.transform.smoothscale(
+                ASSETS[nama_asset],
+                (tile_size, tile_size)
+            )
+
+        gambar = TILE_CACHE[cache_key]
 
         screen.blit(gambar, posisi)
 
@@ -745,52 +759,39 @@ def draw_tiles(screen, tiles):
 
 def draw_block(screen, state):
 
+
     if state is None:
         return
 
-    (r1, c1), (r2, c2) = state
+    (x1, y1), (x2, y2) = state
 
-    # Mengambil posisi awal papan
     origin = ASSET_LAYOUT["blok lantai"]
     tile_size = TILE_SIZE
 
     # Block berdiri
-    if (r1, c1) == (r2, c2):
-
-        nama_asset = "blok berdiri"
-        gambar = ASSETS[nama_asset]
-
-        ukuran = ASSET_LAYOUT[nama_asset]["size"]
+    if (x1, y1) == (x2, y2):
+        gambar = ASSETS["blok berdiri"]
+        ukuran = (tile_size, tile_size)
 
     # Block tidur horizontal
-    elif r1 == r2:
-
-        nama_asset = "blok tidur"
-        gambar = ASSETS[nama_asset]
-
-        ukuran = ASSET_LAYOUT[nama_asset]["size"]
+    elif y1 == y2:
+        gambar = ASSETS["blok tidur"]
+        ukuran = (tile_size * 2, tile_size)
 
     # Block tidur vertikal
     else:
-
-        nama_asset = "blok tidur vertikal"
-
         gambar = pygame.transform.rotate(
             ASSETS["blok tidur"], 90
         )
+        ukuran = (tile_size, tile_size * 2)
 
-        ukuran = ASSET_LAYOUT[nama_asset]["size"]
+    gambar = pygame.transform.smoothscale(gambar, ukuran)
 
-    # Menyesuaikan ukuran gambar
-    gambar = pygame.transform.smoothscale(
-        gambar, ukuran
-    )
-
-    # Menentukan posisi block berdasarkan koordinat
-    x = origin[0] + min(c1, c2) * tile_size
-    y = origin[1] + min(r1, r2) * tile_size
+    x = origin[0] + min(x1, x2) * tile_size
+    y = origin[1] + min(y1, y2) * tile_size
 
     screen.blit(gambar, (x, y))
+
 
 
 # ==================================================

@@ -7,7 +7,7 @@ from game_render import draw_page, LEVELS
 
 # Mengambil fungsi mekanisme game
 # dari game_logic.py
-from game_logic import move_block, check_fall, check_win
+from game_logic import move_block as move_block_rc, check_fall, check_win
 
 # Mengambil algoritma pencarian
 # dari solver.py
@@ -65,7 +65,10 @@ def cari_sound(nama):
     return None
 
 SOUND_GAME = cari_sound("bgsound full 3")
-SOUND_PARTY = cari_sound("party bgsound")
+SOUND_PARTY = cari_sound("bgsound party")
+
+# Menyimpan musik yang sedang aktif agar atur_sound() tidak NameError
+musik_aktif = None
 
 SOUND_JUMPSCARE = {
     1: cari_sound("bgsound js lvl 1"),
@@ -120,17 +123,72 @@ def putar_jumpscare():
 # MEMBER 1
 # ==================================================
 
+def mulai_level(level):
+    start = LEVELS[level]["start"]
+    data_game.update({
+        "page": "gameplay", "level": level,
+        "posisi_block": (start, start), "status": "playing",
+        "solver_method": None, "solver_result": [], "solver_index": 0,
+        "solver_running": False, "solver_last_time": 0,
+        "solver_stats": {}, "solver_show_performance": False
+    })
+
+
 def atur_menu(event):
+    # Keyboard: ESC untuk kembali, R untuk restart
+    if event.type == pygame.KEYDOWN:
+        if event.key == pygame.K_ESCAPE:
+            page = data_game["page"]
+            if page == "level_select":
+                data_game["page"] = "landing"
+            elif page in ("gameplay", "win", "jumpscare", "party"):
+                data_game["page"] = "level_select"
+            data_game["solver_running"] = False
+            data_game["solver_show_performance"] = False
+            return
 
-    # Mengatur tombol Start, Setting, dan Credit.
-    # Mengatur perpindahan Landing ke Level Selection.
-    # Mengatur pemilihan level.
-    # Mengambil data level dari LEVELS di game_render.py.
-    # Mengatur posisi awal block ketika level dimulai.
-    # Mengatur tombol Back, Restart, dan Next Level.
+        if event.key == pygame.K_r:
+            if data_game["page"] in ("gameplay", "win", "jumpscare"):
+                level = data_game["level"]
+                if level in LEVELS:
+                    mulai_level(level)
+                    print(f"RESTART LEVEL {level}")
+            return
 
+        # Enter pada halaman kemenangan: lanjut ke level berikutnya
+        if event.key == pygame.K_RETURN and data_game["page"] == "win":
+            level = data_game["level"]
+            if level < max(LEVELS):
+                data_game["unlocked_level"] = max(data_game["unlocked_level"], level + 1)
+                mulai_level(level + 1)
+            else:
+                data_game["page"] = "party"
+            return
 
-    pass
+    if event.type != pygame.MOUSEBUTTONDOWN or event.button != 1:
+        return
+
+    mouse_x, mouse_y = event.pos
+    if data_game["page"] == "landing":
+        if pygame.Rect(586, 775, 267, 55).collidepoint(mouse_x, mouse_y):
+            data_game["page"] = "level_select"
+            print("START BERHASIL DIKLIK!")
+        return
+
+    if data_game["page"] == "level_select":
+        tombol_level = {
+            1: pygame.Rect(300, 450, 220, 220),
+            2: pygame.Rect(610, 450, 220, 220),
+            3: pygame.Rect(920, 450, 220, 220)
+        }
+        for level, area in tombol_level.items():
+            if area.collidepoint(mouse_x, mouse_y):
+                if level > data_game["unlocked_level"]:
+                    print(f"Level {level} masih terkunci!")
+                    return
+                mulai_level(level)
+                print(f"MASUK LEVEL {level}")
+                return
 
 
 # ==================================================
@@ -161,7 +219,11 @@ def gerak_pemain(event):
     # Mengambil posisi block saat ini
     posisi_sekarang = data_game["posisi_block"]
     # Menghitung posisi block setelah bergerak
-    posisi_baru = move_block(posisi_sekarang, direction)
+    # game_logic menggunakan (baris, kolom), sedangkan LEVELS dan render (x, y).
+    # Konversi dua arah agar tombol panah bergerak sesuai layar.
+    posisi_rc = tuple((y, x) for x, y in posisi_sekarang)
+    hasil_rc = move_block_rc(posisi_rc, direction)
+    posisi_baru = tuple((kolom, baris) for baris, kolom in hasil_rc)
     # Menyimpan posisi baru
     data_game["posisi_block"] = posisi_baru
 
