@@ -260,6 +260,12 @@ def cek_game():
     # Cek apakah block mencapai goal
     if check_win(posisi_block, goal):
 
+        # Solver selesai: tetap di gameplay agar panel statistik terlihat.
+        if data_game.get("solver_method") and data_game.get("solver_result") and data_game["solver_index"] >= len(data_game["solver_result"]):
+            data_game["solver_running"] = False
+            data_game["solver_show_performance"] = True
+            return
+
         data_game["status"] = "win"
         data_game["page"] = "win"
         data_game["solver_running"] = False
@@ -272,26 +278,88 @@ def cek_game():
 # ==================================================
 
 def pilih_solver(event):
+    if data_game["page"] != "gameplay" or data_game["solver_running"]:
+        return
+    if event.type != pygame.MOUSEBUTTONDOWN or event.button != 1:
+        return
 
-    # Mendeteksi pilihan BFS, DFS, atau UCS.
-    # Memanggil algoritma yang dipilih dari solver.py.
-    # Mengirim posisi block dan data level.
-    # Menyimpan hasil pencarian ke solver_result.
-    # Mengatur solver_index menjadi 0.
-    # Menjalankan Solver jika solusi ditemukan.
+    x, y = event.pos
+    tombol = {
+        "BFS": pygame.Rect(28, 558, 138, 54),
+        "DFS": pygame.Rect(28, 628, 138, 54),
+        "UCS": pygame.Rect(28, 698, 138, 54),
+    }
+    for metode, area in tombol.items():
+        if area.collidepoint(x, y):
+            data_game["solver_method"] = metode
+            data_game["solver_show_performance"] = False
+            print(f"Solver dipilih: {metode}")
+            return
 
-    pass
+    if not pygame.Rect(1212, 30, 198, 69).collidepoint(x, y):
+        return
+
+    metode = data_game.get("solver_method")
+    if metode not in ("BFS", "DFS", "UCS"):
+        print("Pilih BFS, DFS, atau UCS terlebih dahulu!")
+        return
+
+    level = data_game["level"]
+    if level not in LEVELS:
+        return
+
+    # game_logic dan solver.py memakai (baris, kolom),
+    # sementara LEVELS dan tampilan memakai (x, y).
+    state_rc = tuple((y0, x0) for x0, y0 in data_game["posisi_block"])
+    level_xy = LEVELS[level]
+    level_rc = {
+        **level_xy,
+        "tiles": {(y0, x0): jenis for (x0, y0), jenis in level_xy["tiles"].items()},
+        "goal": (level_xy["goal"][1], level_xy["goal"][0]),
+    }
+
+    fungsi = {"BFS": bfs, "DFS": dfs, "UCS": ucs}[metode]
+    hasil = fungsi(state_rc, level_rc)
+    data_game["solver_stats"] = hasil
+    data_game["solver_result"] = hasil.get("path", [])
+    data_game["solver_index"] = 0
+    data_game["solver_last_time"] = pygame.time.get_ticks()
+    data_game["solver_show_performance"] = False
+    data_game["solver_running"] = bool(data_game["solver_result"])
+
+    if not data_game["solver_running"]:
+        data_game["solver_show_performance"] = True
+        print("Tidak ada langkah solver (sudah di goal atau solusi tidak ditemukan).")
+    else:
+        print(f"{metode}: {len(data_game['solver_result'])} langkah")
 
 
 def gerak_solver():
+    if data_game["page"] != "gameplay" or not data_game["solver_running"]:
+        return
 
-    # Mengambil gerakan berikutnya dari solver_result.
-    # Menjalankan gerakan satu per satu.
-    # Memanggil move_block() dari game_logic.py.
-    # Memberikan jeda antar gerakan.
-    # Menghentikan Solver jika solusi selesai atau game berakhir.
+    sekarang = pygame.time.get_ticks()
+    if sekarang - data_game["solver_last_time"] < 300:
+        return
 
-    pass
+    indeks = data_game["solver_index"]
+    langkah = data_game["solver_result"]
+    if indeks >= len(langkah):
+        data_game["solver_running"] = False
+        data_game["solver_show_performance"] = True
+        return
+
+    arah = langkah[indeks]
+    state_xy = data_game["posisi_block"]
+    state_rc = tuple((y0, x0) for x0, y0 in state_xy)
+    hasil_rc = move_block_rc(state_rc, arah)
+    data_game["posisi_block"] = tuple((kolom, baris) for baris, kolom in hasil_rc)
+    data_game["solver_index"] += 1
+    data_game["solver_last_time"] = sekarang
+
+    if data_game["solver_index"] >= len(langkah):
+        data_game["solver_running"] = False
+        data_game["solver_show_performance"] = True
 
 
 # ==================================================

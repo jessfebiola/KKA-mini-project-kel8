@@ -447,36 +447,9 @@ ASSET_LAYOUT = {
     },
 
     "solver performance": {
-        "pos": (853, 727),
-        "size": (559, 269)
+        "pos": (440, 375),
+        "size": (560, 270)
     },
-
-    # Posisi teks Solver Performance
-    "solver_text_0": {
-        "pos": (900, 765),
-        "size": 26
-    },
-
-    "solver_text_1": {
-        "pos": (900, 805),
-        "size": 26
-    },
-
-    "solver_text_2": {
-        "pos": (900, 845),
-        "size": 26
-    },
-
-    "solver_text_3": {
-        "pos": (900, 885),
-        "size": 26
-    },
-
-    "solver_text_4": {
-        "pos": (900, 925),
-        "size": 26
-    },
-
 
     # =========================
     # GAMEPLAY - BOARD
@@ -512,8 +485,10 @@ ASSET_LAYOUT = {
     # =========================
 
     "menang": {
-        "pos": (400, 250),
-        "size": (640, 450)
+        # Asset asli 462 x 129 (rasio 3.58:1).
+        # Ukuran ini mempertahankan rasio sehingga tulisan tidak penyet.
+        "pos": (350, 409),
+        "size": (740, 207)
     },
 
 
@@ -850,53 +825,43 @@ def draw_puzzle_guide(screen):
 # ==================================================
 
 def draw_solver_performance(screen, data_game):
-
-    # Membuat lapisan gelap di belakang pop-up
-    overlay = pygame.Surface(
-        screen.get_size(),
-        pygame.SRCALPHA
-    )
-
+    """Tampilkan panel statistik di tengah tanpa teks saling bertumpuk."""
+    overlay = pygame.Surface(screen.get_size(), pygame.SRCALPHA)
     overlay.fill((0, 0, 0, 120))
     screen.blit(overlay, (0, 0))
 
-    # Menampilkan panel Solver Performance
-    gambar_asset(
-        screen,
-        "solver performance",
-        "solver performance"
-    )
+    # Asset asli sudah berisi judul dan label statistik.
+    gambar_asset(screen, "solver performance", "solver performance")
 
-    # Mengambil hasil pencarian dari solver.py
     hasil = data_game.get("solver_stats", {})
+    algorithm = hasil.get("algorithm") or data_game.get("solver_method") or "-"
+    path = hasil.get("path", []) or []
+    path_length = hasil.get("path_length", len(path))
+    discovered = hasil.get("discovered", "-")
+    expanded = hasil.get("expanded", "-")
+    elapsed = hasil.get("time", 0) or 0
 
-    informasi = [
-        ("Algorithm", hasil.get("algorithm", "-")),
-        ("Path Length", len(hasil.get("path", []))),
-        ("Discovered State", hasil.get("discovered", "-")),
-        ("Expanded State", hasil.get("expanded", "-")),
-        ("Execution Time", f"{hasil.get('time', 0):.6f} s")
+    nilai_statistik = [
+        str(algorithm),
+        str(path_length),
+        str(discovered),
+        str(expanded),
+        f"{float(elapsed):.6f} s",
     ]
 
-    # Menampilkan statistik Solver
-    for index, (label, nilai) in enumerate(informasi):
+    # Titik awal nilai relatif terhadap posisi panel (bukan layar).
+    panel = ASSET_LAYOUT["solver performance"]
+    px, py = panel["pos"]
+    pw, ph = panel["size"]
+    # Kolom nilai di sisi kanan label bawaan gambar.
+    value_x = px + int(pw * 0.62)
+    start_y = py + int(ph * 0.28)
+    line_gap = int(ph * 0.132)
+    font = pygame.font.Font(None, 25)
 
-        layout_key = f"solver_text_{index}"
-
-        if layout_key not in ASSET_LAYOUT:
-            continue
-
-        layout = ASSET_LAYOUT[layout_key]
-
-        posisi = layout["pos"]
-        ukuran = layout["size"]
-
-        gambar_teks(
-            screen,
-            f"{label}: {nilai}",
-            posisi,
-            ukuran
-        )
+    for index, value in enumerate(nilai_statistik):
+        teks = font.render(value, True, (255, 255, 255))
+        screen.blit(teks, (value_x, start_y + index * line_gap))
 
 
 # ==================================================
