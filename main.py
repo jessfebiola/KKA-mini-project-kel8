@@ -209,12 +209,15 @@ def cari_solusi_level2(start_state, metode, o_open=False, x_open=False):
     urutan = ("UP", "DOWN", "LEFT", "RIGHT")
     if metode == "UCS":
         frontier = [(0, 0, awal)]
+        distances = {awal: 0}
         counter = 0
     else:
         frontier = deque([awal]) if metode == "BFS" else [awal]
     while frontier:
         if metode == "UCS":
-            _, _, node = heapq.heappop(frontier)
+            biaya, _, node = heapq.heappop(frontier)
+            if biaya != distances[node]:
+                continue
         elif metode == "BFS":
             node = frontier.popleft()
         else:
@@ -240,7 +243,8 @@ def cari_solusi_level2(start_state, metode, o_open=False, x_open=False):
             parents[next_node] = (node, arah)
             if metode == "UCS":
                 counter += 1
-                heapq.heappush(frontier, (len(parents), counter, next_node))
+                distances[next_node] = biaya + 1
+                heapq.heappush(frontier, (biaya + 1, counter, next_node))
             else:
                 frontier.append(next_node)
     return {"algorithm": metode, "path": [], "discovered": len(parents),
@@ -338,20 +342,20 @@ def gerak_pemain(event):
     # Mengambil posisi block saat ini
     posisi_sekarang = data_game["posisi_block"]
     # Menghitung posisi block setelah bergerak
-    posisi_baru = move_block(posisi_sekarang, direction)
+    posisi_baru = normalisasi(move_block(posisi_sekarang, direction))
     # Menyimpan posisi baru
     data_game["posisi_block"] = posisi_baru
-    # Mengaktifkan bridge jika switch Level 2 terinjak
+    # Samakan mekanisme switch dengan solver Level 2.
     if data_game["level"] == 2:
-        bo, bx = update_bridges(
+        bo, bx = tekan_switch_level2(
             posisi_baru,
-            LEVELS[2]["tiles"],
             data_game["bridge_o_open"],
-            data_game["bridge_x_open"]
+            data_game["bridge_x_open"],
+            posisi_sekarang,
         )
-
         data_game["bridge_o_open"] = bo
         data_game["bridge_x_open"] = bx
+
 
 def cek_game():
 
@@ -487,9 +491,14 @@ def gerak_solver():
 
     arah = langkah[indeks]
     state_xy = data_game["posisi_block"]
-    state_rc = tuple((y0, x0) for x0, y0 in state_xy)
-    hasil_rc = move_block_rc(state_rc, arah)
-    data_game["posisi_block"] = tuple((kolom, baris) for baris, kolom in hasil_rc)
+    if data_game["level"] == 2:
+        # Solver Level 2 dan game_logic memakai koordinat (x, y).
+        data_game["posisi_block"] = normalisasi(move_block(state_xy, arah))
+    else:
+        # Pertahankan konversi untuk solver.py Level 1/3 yang memakai (row, col).
+        state_rc = tuple((y0, x0) for x0, y0 in state_xy)
+        hasil_rc = move_block(state_rc, arah)
+        data_game["posisi_block"] = tuple((kolom, baris) for baris, kolom in hasil_rc)
     if data_game["level"] == 2:
         bo, bx = tekan_switch_level2(data_game["posisi_block"], data_game["bridge_o_open"], data_game["bridge_x_open"], state_xy)
         data_game["bridge_o_open"], data_game["bridge_x_open"] = bo, bx
