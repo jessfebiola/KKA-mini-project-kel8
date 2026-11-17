@@ -2,7 +2,6 @@
 
 | No           | Name        | NRP     |
 | ---            | ---        | ----------|
-|  |  |  |
 | 1 | Luthfir Rizqy Fathullah Hanggi | 5025251081 |
 | 2 | Yesenia Valencia W| 5025251182 | 
 | 3 | Claresta Amelinda H. | 5025251184 | 
