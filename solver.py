@@ -23,10 +23,6 @@ def normalize(state):
 
 
 def move_cost(state, new_state):
-    # Biaya satu gerakan untuk UCS.
-    # Saat ini setiap gerakan berbiaya 1, sehingga UCS menghasilkan
-    # jalur sependek BFS. Ubah di sini kalau ingin biaya berbeda,
-    # misalnya block berdiri/tidur lebih mahal dari menggelinding.
     return 1
 
 
@@ -58,8 +54,6 @@ def build_path(parent, state):
 
 
 def make_result(algorithm, path, discovered, expanded, start_time):
-    # Format hasil sama dengan yang dibaca panel Solver Performance
-    # di game_render.py: algorithm, path, discovered, expanded, time.
     return {
         "algorithm": algorithm,
         "path": path,
@@ -71,7 +65,6 @@ def make_result(algorithm, path, discovered, expanded, start_time):
 
 # ==================================================
 # BREADTH FIRST SEARCH (BFS)
-# MEMBER 4
 # ==================================================
 
 def bfs(start_state, level_data):
@@ -121,7 +114,6 @@ def bfs(start_state, level_data):
 
 # ==================================================
 # DEPTH FIRST SEARCH (DFS)
-# MEMBER 4
 # ==================================================
 
 def dfs(start_state, level_data):
@@ -209,8 +201,7 @@ def ucs(start_state, level_data):
         closed.add(state)
         expanded += 1
 
-        # Goal dicek saat diambil dari heap, bukan saat ditemukan,
-        # supaya biaya yang didapat dijamin paling kecil.
+        # Goal dicek saat diambil dari heap, bukan saat ditemukan, agar cost paling kecil.
         if check_win(state, goal):
             path = build_path(parent, state)
             result = make_result("UCS", path, len(best_cost),
@@ -233,4 +224,5 @@ def ucs(start_state, level_data):
 
     # Tidak ada solusi
     return make_result("UCS", [], len(best_cost), expanded, start_time)
+
 
