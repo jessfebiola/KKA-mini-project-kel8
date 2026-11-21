@@ -170,53 +170,66 @@ Pastikan folder `assets/` tetap berada di dalam folder proyek agar gambar dan mu
 *Tampilan akhir setelah pemain menyelesaikan permainan.*
 
 
+
 ## Perbandingan Hasil Pengujian
 
-Pengujian dilakukan pada tiga level menggunakan BFS, DFS, dan UCS. Berikut hasil perbandingan dari masing-masing algoritma.
+Pengujian dilakukan pada tiga level menggunakan algoritma BFS, DFS, dan UCS. Berikut perbandingan hasil dari masing-masing algoritma berdasarkan empat indikator.
 
 ### 1. Path Length
-Jumlah langkah yang dibutuhkan sampai balok mencapai tujuan.
 
-```text
-BFS | ███████              42  🏆
-DFS | ████████████████████ 120
-UCS | ███████              43
+Jumlah langkah yang dibutuhkan balok untuk mencapai tujuan. Semakin sedikit jumlah langkah, semakin pendek jalur yang ditemukan.
+
+```mermaid
+xychart-beta
+    x-axis ["BFS", "DFS", "UCS"]
+    y-axis "Jumlah Langkah" 0 --> 130
+    bar [42, 120, 43]
 ```
-**Terbaik: BFS** (berhasil menemukan jalur dengan jumlah langkah paling sedikit)
+
+**Terbaik: BFS** — menghasilkan jalur dengan jumlah langkah paling sedikit.
 
 ### 2. Discovered State
+
 Jumlah state yang ditemukan selama proses pencarian.
 
-```text
-BFS | ██████████████████   458  🏆
-DFS | ██████████████████   464
-UCS | ████████████████████ 488
+```mermaid
+xychart-beta
+    x-axis ["BFS", "DFS", "UCS"]
+    y-axis "Jumlah State" 0 --> 520
+    bar [458, 464, 488]
 ```
-**Terbaik: BFS** (jumlah state yang ditemukan paling sedikit)
+
+**Terbaik: BFS** — menemukan jumlah state paling sedikit.
 
 ### 3. Expanded State
-Jumlah state yang diperiksa lebih lanjut untuk mencari kemungkinan gerakan berikutnya.
 
-```text
-BFS | ██████████████████   400
-DFS | █████████████████    382  🏆
-UCS | ████████████████████ 433
+Jumlah state yang dikembangkan untuk mencari kemungkinan gerakan berikutnya.
+
+```mermaid
+xychart-beta
+    x-axis ["BFS", "DFS", "UCS"]
+    y-axis "Jumlah State" 0 --> 460
+    bar [400, 382, 433]
 ```
-**Terbaik: DFS** (jumlah state yang dikembangkan paling sedikit)
+
+**Terbaik: DFS** — memiliki jumlah expanded state paling sedikit.
 
 ### 4. Execution Time
-Waktu yang dibutuhkan algoritma untuk menemukan solusi.
 
-```text
-BFS | ████████████████████ 0.005759 s
-DFS | ███████████████      0.004225 s  🏆
-UCS | █████████████████    0.005005 s
+Waktu yang dibutuhkan algoritma untuk menemukan solusi. Semakin kecil waktunya, semakin cepat proses pencarian.
+
+```mermaid
+xychart-beta
+    x-axis ["BFS", "DFS", "UCS"]
+    y-axis "Waktu (detik)" 0 --> 0.006
+    bar [0.005759, 0.004225, 0.005005]
 ```
-**Terbaik: DFS** (waktu pencariannya paling singkat)
+
+**Terbaik: DFS** — memiliki waktu pencarian paling singkat.
 
 ### Kesimpulan
 
-Dari hasil pengujian, BFS lebih unggul dalam mencari jalur yang pendek, sedangkan DFS membutuhkan langkah lebih banyak tetapi waktu pencariannya lebih singkat. UCS menghasilkan jalur yang hampir sama dengan BFS, karena setiap gerakan memiliki biaya yang sama. Jadi, BFS lebih cocok jika ingin mendapatkan jalur dengan langkah sesedikit mungkin, sedangkan DFS lebih cepat dalam menemukan solusi pada pengujian ini.
+Berdasarkan hasil pengujian, BFS lebih unggul dalam menghasilkan jalur yang pendek dan menemukan jumlah state yang lebih sedikit. Sementara itu, DFS memiliki waktu pencarian paling singkat dan jumlah expanded state paling sedikit, meskipun jalur yang dihasilkan lebih panjang. UCS memberikan hasil jalur yang hampir sama dengan BFS karena setiap gerakan memiliki biaya yang sama. Dengan demikian, setiap algoritma memiliki keunggulan masing-masing berdasarkan aspek yang dibandingkan.
 
 ## Daftar Pustaka
 
