@@ -169,6 +169,55 @@ Pastikan folder `assets/` tetap berada di dalam folder proyek agar gambar dan mu
 
 *Tampilan akhir setelah pemain menyelesaikan permainan.*
 
+
+## Perbandingan Hasil Pengujian
+
+Pengujian dilakukan pada tiga level menggunakan BFS, DFS, dan UCS. Berikut hasil perbandingan dari masing-masing algoritma.
+
+### 1. Path Length
+Jumlah langkah yang dibutuhkan sampai balok mencapai tujuan.
+
+```text
+BFS | ███████              42  🏆
+DFS | ████████████████████ 120
+UCS | ███████              43
+```
+**Terbaik: BFS** (berhasil menemukan jalur dengan jumlah langkah paling sedikit)
+
+### 2. Discovered State
+Jumlah state yang ditemukan selama proses pencarian.
+
+```text
+BFS | ██████████████████   458  🏆
+DFS | ██████████████████   464
+UCS | ████████████████████ 488
+```
+**Terbaik: BFS** (jumlah state yang ditemukan paling sedikit)
+
+### 3. Expanded State
+Jumlah state yang diperiksa lebih lanjut untuk mencari kemungkinan gerakan berikutnya.
+
+```text
+BFS | ██████████████████   400
+DFS | █████████████████    382  🏆
+UCS | ████████████████████ 433
+```
+**Terbaik: DFS** (jumlah state yang dikembangkan paling sedikit)
+
+### 4. Execution Time
+Waktu yang dibutuhkan algoritma untuk menemukan solusi.
+
+```text
+BFS | ████████████████████ 0.005759 s
+DFS | ███████████████      0.004225 s  🏆
+UCS | █████████████████    0.005005 s
+```
+**Terbaik: DFS** (waktu pencariannya paling singkat)
+
+### Kesimpulan
+
+Dari hasil pengujian, BFS lebih unggul dalam mencari jalur yang pendek, sedangkan DFS membutuhkan langkah lebih banyak tetapi waktu pencariannya lebih singkat. UCS menghasilkan jalur yang hampir sama dengan BFS, karena setiap gerakan memiliki biaya yang sama. Jadi, BFS lebih cocok jika ingin mendapatkan jalur dengan langkah sesedikit mungkin, sedangkan DFS lebih cepat dalam menemukan solusi pada pengujian ini.
+
 ## Daftar Pustaka
 
 Clarke, D. (1999). Bloxorg [Video Game].https://www.coolmathgames.com/0-bloxorz?variant=next
