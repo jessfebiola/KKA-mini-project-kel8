@@ -227,7 +227,7 @@ xychart-beta
 
 **Terbaik: DFS** — memiliki waktu pencarian paling singkat.
 
-### Kesimpulan
+### Kesimpulan Perbandingan Algoritma Uninformed Search (BFS, DFS, UCS)
 
 Berdasarkan hasil pengujian, BFS lebih unggul dalam menghasilkan jalur yang pendek dan menemukan jumlah state yang lebih sedikit. Sementara itu, DFS memiliki waktu pencarian paling singkat dan jumlah expanded state paling sedikit, meskipun jalur yang dihasilkan lebih panjang. UCS memberikan hasil jalur yang hampir sama dengan BFS karena setiap gerakan memiliki biaya yang sama. Dengan demikian, setiap algoritma memiliki keunggulan masing-masing berdasarkan aspek yang dibandingkan.
 
