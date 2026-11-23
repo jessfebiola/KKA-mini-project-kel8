@@ -12,6 +12,9 @@
 
 Roll to Vivat adalah game puzzle berbasis Python dan Pygame yang terinspirasi dari permainan Bloxorz. Pemain menggerakkan sebuah balok di atas papan untuk mencapai kotak tujuan tanpa terjatuh dari jalur. Game ini menyediakan tiga level dengan tantangan yang berbeda serta fitur Solver untuk mencari urutan gerakan secara otomatis.
 
+# Roll to Vivat DEMO
+[DEMO](https://youtu.be/-NOatepVtec)
+
 ## Fitur
 
 - **3 level permainan** dengan susunan papan dan tantangan yang berbeda.
